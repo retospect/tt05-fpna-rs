@@ -1,4 +1,5 @@
 
+
 module tt_um_retospect_neurochip #( parameter MAX_COUNT = 24'd10_000_000 ) (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
