@@ -27,6 +27,12 @@ documentation:
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
+      An array of neuromorphic CNBs (Configurable Neuron Blocks). Each CNB has a 
+      3 inputs, and 3 associated weights, that get added to its membrane potential. 
+      When a CNB fires, it sends a pulse to 3 of its neighbours.
+      Each CNB is subscribed to one of 8 decay clock tools. 
+
+      Each CNB can be initialized with weights, the selection of its :
       Uses a set of registers to divide the clock, and then some combinational logic
       to convert from binary to decimal for the display.
 
