@@ -88,10 +88,9 @@ module NEURON (
     clk,
     nn_reset,
     Axon
-    dBus
 );
   input bs_in, clk, conf_en, nn_reset, A, B, C;
-  input [7:0] dBus;  // the decay clock bus
+  reg [7:0] dBus;  // the decay clock bus
   output bs_out, Axon;  // the bitstream shift register output
   reg [2:0] wA, wB, wC;  // the weights of the neuron
   reg [4:0] U;  // the membrane voltage as an int
