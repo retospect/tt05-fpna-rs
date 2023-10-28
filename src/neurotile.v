@@ -62,7 +62,6 @@ module BRAIN (
 
   // for each row, we make 5 neurons, and connect them to each other
   // with a for loop
-  wire [0:7] dBus; 
   NEURON A (
       IN1, IN2, IN3,
       conf_en, 
@@ -70,8 +69,8 @@ module BRAIN (
       bs_out,
       clk,
       nn_reset,
-      F3Axon,
-      dBus
+      F3Axon
+      
   );
 
 
