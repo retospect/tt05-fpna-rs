@@ -1,0 +1,9 @@
+echo "cd src; make" | docker run -i --rm --mount src="$(pwd)",target=/src,type=bind tinytapeout /bin/bash 
+
+# Echo: the commands to run in the docker
+# docker run: Run the docker
+# -i: Interactive (use the output of echo)
+# --rm: Delete container when it's finished
+# --mount: Mount the local directory
+# tinytapeout: Use that imate (if it causes an error, ``docker build -t tinytapeout .`` will build it. 
+# /bin/bash: run the commands from echo in the bash shell
