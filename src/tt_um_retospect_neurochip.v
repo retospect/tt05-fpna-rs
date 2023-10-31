@@ -23,6 +23,7 @@ module tt_um_retospect_neurochip #( parameter MAX_COUNT = 24'd10_000_000 ) (
     wire bs_in = uio_in[2];
     wire bs_out = uio_out[1];
     wire reset_nn = uio_in[0];
-
+    assign bs_out = 1;
+    assign outbus = 1;
 
 endmodule
