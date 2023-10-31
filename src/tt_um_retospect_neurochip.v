@@ -12,12 +12,17 @@ module tt_um_retospect_neurochip #( parameter MAX_COUNT = 24'd10_000_000 ) (
 );
 
     wire reset = ! rst_n;
-    wire [6:0] led_out;
 
     // use bidirectionals as outputs
-    assign uio_oe = 8'b11110000;
-
-
+    assign uio_oe = 8'b11000010;
+    wire [0:9] inbus;
+    assign inbus = {ui_in[7:0], uio_in[7:6]};
+    wire [0:9] outbus;
+    assign {uo_out[7:0], uio_out[5:4]} = outbus;
+    wire config_en = uio_in[3];
+    wire bs_in = uio_in[2];
+    wire bs_out = uio_out[1];
+    wire reset_nn = uio_in[0];
 
 
 endmodule
