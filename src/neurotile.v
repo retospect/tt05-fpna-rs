@@ -13,7 +13,7 @@ module tt_um_retospect_neurochip #(
     input  wire       rst_n     // reset_n - low to reset
 );
 
-always @(posedge clk): GOTHRU
+always @(posedge clk) begin
 	uio_out <= uio_in;
 end
 
