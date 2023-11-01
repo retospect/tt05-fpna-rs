@@ -21,9 +21,15 @@ def isBitstream(bitstream):
     assert all(x == 0 or x == 1 for x in bitstream)
 
 
-async def loadBitstream(dut, bitstream, bs_in, config_en):
+async def loadBitstream(dut, bitstream):
     """load the bitstream into the shift register"""
     isBitstream(bitstream)
+
+    config_en = dut.uio_in[3]
+    bs_in = dut.uio_in[2]
+    bs_out = dut.uio_out[1]
+    bs_in.value = 0
+
     config_en.value = 1
 
     for bit in bitstream:
@@ -33,24 +39,27 @@ async def loadBitstream(dut, bitstream, bs_in, config_en):
     bs_in.value = 0
 
 
-async def checkBitstream(dut, bitstream, bs_out, config_en):
+async def checkBitstream(dut, bitstream):
     """check the shift register against the expected bitstream"""
     isBitstream(bitstream)
 
+    config_en = dut.uio_in[3]
+    bs_in = dut.uio_in[2]
+    bs_out = dut.uio_out[1]
+    bs_in.value = 0
+
     config_en.value = 1
+
     for i in range(len(bitstream)):
         await ClockCycles(dut.clk, 1)
         bit = bitstream[i]
         assert bs_out.value == bit
     config_en.value = 0
-
-
-@cocotb.test()
-async def test_shiftreg(dut):
-    config_en = dut.uio_in[3]
-    bs_in = dut.uio_in[2]
-    bs_out = dut.uio_out[1]
     bs_in.value = 0
+
+async def reset(dut, bitstream):
+    """Initialize the device and load the provided bitstream"""
+    config_en = dut.uio_in[3]
 
     dut._log.info("start")
     clock = Clock(dut.clk, 10, units="us")
@@ -68,12 +77,19 @@ async def test_shiftreg(dut):
 
     print("bitstream length: %d" % len(bitarray))
     dut._log.info("bitstream length: %d" % len(bitarray))
+    await loadBitstream(dut, bitarray)
+    config_en.value = 0
 
-    await loadBitstream(dut, bitarray, bs_in, config_en)
-    await checkBitstream(dut, bitarray, bs_out, config_en)
 
-    # bitstream.cells[1][1].uT.set(5)
+@cocotb.test()
+async def test_shiftreg(dut):
+
+    bitstream = getBitstream()
+    await reset(dut, bitstream)
+    await checkBitstream(dut, bitstream.getBS())
+
     bitstream.ones()
-    bitarray = bitstream.getBS()
-    await loadBitstream(dut, bitarray, bs_in, config_en)
-    await checkBitstream(dut, bitarray, bs_out, config_en)
+    bitstream.cells[1][1].uT.set(5)
+    bitstream.cells[0][1].uT.set(3)
+    await loadBitstream(dut, bitstream.getBS())
+    await checkBitstream(dut, bitstream.getBS())
