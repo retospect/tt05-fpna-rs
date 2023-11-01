@@ -41,7 +41,6 @@ async def checkBitstream(dut, bitstream, bs_out, config_en):
     for i in range(len(bitstream)):
         await ClockCycles(dut.clk, 1)
         bit = bitstream[i]
-        print(i, bs_out.value, bit)
         assert bs_out.value == bit
     config_en.value = 0
 
@@ -76,6 +75,5 @@ async def test_shiftreg(dut):
     # bitstream.cells[1][1].uT.set(5)
     bitstream.ones()
     bitarray = bitstream.getBS()
-    print(bitarray)
     await loadBitstream(dut, bitarray, bs_in, config_en)
     await checkBitstream(dut, bitarray, bs_out, config_en)
