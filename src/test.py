@@ -66,9 +66,7 @@ async def test_shiftreg(dut):
     loadBitstream(dut, bitarray, bs_in, config_en)
     checkBitstream(dut, bitarray, bs_out, config_en)
 
-    bitstream.cells[1][1].uT.value = 5
-    bitarray = bitstream.getBS()
+    bitstream.cells[1][1].uT.set(5)
     loadBitstream(dut, bitarray, bs_in, config_en)
+    bitarray = bitstream.getBS()
     checkBitstream(dut, bitarray, bs_out, config_en)
-
-    bitstream.cells[1][1].uT = 5

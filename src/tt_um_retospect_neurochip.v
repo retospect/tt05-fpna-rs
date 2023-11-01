@@ -28,7 +28,7 @@ module tt_um_retospect_neurochip #( parameter MAX_COUNT = 24'd10_000_000 ) (
     assign uio_out[1] = bs_out;
     wire reset_nn = uio_in[0];
 
-    localparam BS_LENGTH = 258;
+    localparam BS_LENGTH = 255;
     reg [0:BS_LENGTH] bs = 0;
     // on each rising edge, if config_en is high, load the value from bs_in
     // into the bs register and set bs_out to the output of the bs register
