@@ -28,6 +28,14 @@ module tt_um_retospect_neurochip
     wire bs_in = uio_in[2];
     wire bs_out;
     assign uio_out[1] = bs_out;
+
+    // Fix yosys
+    assign uio_out[7] = 1;
+    assign uio_out[6] = 1;
+    assign uio_out[3] = 1;
+    assign uio_out[2] = 1;
+    assign uio_out[0] = 1;
+
     wire reset_nn = uio_in[0];
 
     reg [0:BS_LENGTH] bs = 0;
