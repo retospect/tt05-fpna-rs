@@ -22,6 +22,12 @@ class BitstreamGen:
             for y in range(self.yCells):
                 self.cells[x][y].reset()
 
+    def ones(self):
+        """set all the cells to 1"""
+        for x in range(self.xCells):
+            for y in range(self.yCells):
+                self.cells[x][y].ones()
+
     def getBS(self):
         """get the bitstream of the generator"""
         bs = []
@@ -47,6 +53,10 @@ class Register:
     def reset(self):
         """reset the register to 0"""
         self.value = 0
+
+    def ones(self):
+        """set the register to all 1's"""
+        self.value = 2**self.length - 1
 
     def getBS(self):
         """get the array of bits representing the register"""
@@ -78,6 +88,14 @@ class Cell:
         self.w3.reset()
         self.uT.reset()
         self.clockDecay.reset()
+
+    def ones(self):
+        """set the cell to all 1's"""
+        self.w1.ones()
+        self.w2.ones()
+        self.w3.ones()
+        self.uT.ones()
+        self.clockDecay.ones()
 
 
 if __name__ == "__main__":
@@ -112,5 +130,11 @@ if __name__ == "__main__":
     assert len(bs) == xCells * yCells * 16
     for i in range(len(bs)):
         assert bs[i] == 0
+
+    bitstream_gen.ones()
+    bs = bitstream_gen.getBS()
+    assert len(bs) == xCells * yCells * 16
+    for i in range(len(bs)):
+        assert bs[i] == 1
 
     print("All tests passed.")

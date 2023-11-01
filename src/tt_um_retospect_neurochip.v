@@ -1,6 +1,8 @@
 `default_nettype none
 
-module tt_um_retospect_neurochip #( parameter MAX_COUNT = 24'd10_000_000 ) (
+module tt_um_retospect_neurochip 
+#( parameter BS_LENGTH = 256-1)
+(
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
     input  wire [7:0] uio_in,   // IOs: Bidirectional Input path
@@ -28,14 +30,13 @@ module tt_um_retospect_neurochip #( parameter MAX_COUNT = 24'd10_000_000 ) (
     assign uio_out[1] = bs_out;
     wire reset_nn = uio_in[0];
 
-    localparam BS_LENGTH = 255;
     reg [0:BS_LENGTH] bs = 0;
     // on each rising edge, if config_en is high, load the value from bs_in
     // into the bs register and set bs_out to the output of the bs register
     // and shfit the bs register left by one bit
     always @(posedge clk) begin
 	if (config_en) begin
-	    bs[0:9] <= {bs_in,bs[0:BS_LENGTH-1]};
+	    bs[0:BS_LENGTH] <= {bs_in,bs[0:BS_LENGTH-1]};
 	end
     end
 

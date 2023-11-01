@@ -13,29 +13,36 @@ def getBitstream():
     return bitstream
 
 
-async def loadBitstream(dut, bitstream, bs_in, config_en):
+def isBitstream(bitstream):
+    """assert that the bitstream is an array of 1's and 0's"""
     # assert that the bitstream is an array of 1's and 0's
     assert isinstance(bitstream, list)
     assert all(isinstance(x, int) for x in bitstream)
     assert all(x == 0 or x == 1 for x in bitstream)
 
+
+async def loadBitstream(dut, bitstream, bs_in, config_en):
+    """load the bitstream into the shift register"""
+    isBitstream(bitstream)
     config_en.value = 1
 
-    for bit in bitarray:
+    for bit in bitstream:
         bs_in.value = bit
         await ClockCycles(dut.clk, 1)
     config_en.value = 0
+    bs_in.value = 0
 
 
-async def checkBitstream(dut, compareStream, bs_out, config_en):
-    assert isinstance(bitstream, list)
-    assert all(isinstance(x, int) for x in bitstream)
-    assert all(x == 0 or x == 1 for x in bitstream)
+async def checkBitstream(dut, bitstream, bs_out, config_en):
+    """check the shift register against the expected bitstream"""
+    isBitstream(bitstream)
 
     config_en.value = 1
-    for bit in compareStream:
-        assert bs_out.value == bit
+    for i in range(len(bitstream)):
         await ClockCycles(dut.clk, 1)
+        bit = bitstream[i]
+        print(i, bs_out.value, bit)
+        assert bs_out.value == bit
     config_en.value = 0
 
 
@@ -63,10 +70,12 @@ async def test_shiftreg(dut):
     print("bitstream length: %d" % len(bitarray))
     dut._log.info("bitstream length: %d" % len(bitarray))
 
-    loadBitstream(dut, bitarray, bs_in, config_en)
-    checkBitstream(dut, bitarray, bs_out, config_en)
+    await loadBitstream(dut, bitarray, bs_in, config_en)
+    await checkBitstream(dut, bitarray, bs_out, config_en)
 
-    bitstream.cells[1][1].uT.set(5)
-    loadBitstream(dut, bitarray, bs_in, config_en)
+    # bitstream.cells[1][1].uT.set(5)
+    bitstream.ones()
     bitarray = bitstream.getBS()
-    checkBitstream(dut, bitarray, bs_out, config_en)
+    print(bitarray)
+    await loadBitstream(dut, bitarray, bs_in, config_en)
+    await checkBitstream(dut, bitarray, bs_out, config_en)
