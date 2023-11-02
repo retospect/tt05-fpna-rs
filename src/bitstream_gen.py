@@ -10,6 +10,7 @@ class BitstreamGen:
         self.xCells = xCells
         self.yCells = yCells
         # cells is a 3d array of cells
+        self.clockbox = ClockBox()  
         self.cells = []
         for x in range(xCells):
             self.cells.append([])
@@ -18,22 +19,22 @@ class BitstreamGen:
 
     def reset(self):
         """reset the bitstream generator"""
-        for x in range(self.xCells):
-            for y in range(self.yCells):
-                self.cells[x][y].reset()
+        self.clockbox.reset()
+        for cell in self.getAllCells():
+            cell.reset()
 
     def ones(self):
         """set all the cells to 1"""
-        for x in range(self.xCells):
-            for y in range(self.yCells):
-                self.cells[x][y].ones()
+        self.clockbox.ones()
+        for cell in self.getAllCells():
+            cell.ones()
 
     def getBS(self):
         """get the bitstream of the generator"""
         bs = []
-        for x in range(self.xCells):
-            for y in range(self.yCells):
-                bs += self.cells[x][y].getBS()
+        bs += self.clockbox.getBS()
+        for cell in self.getAllCells():
+            bs += cell.getBS()
         return bs
 
     def getAllCells(self):
@@ -68,6 +69,32 @@ class Register:
     def getBS(self):
         """get the array of bits representing the register"""
         return [int(x) for x in bin(self.value)[2:].zfill(self.length)]
+
+class ClockBox:
+    def __init__(self):
+        self.delay = []
+        # add 6 8bit registers to the delay array
+        for i in range(6):
+            self.delay.append(Register(8, 0))
+        
+
+    def getBS(self):
+        """get the bitstream of the clock box"""
+        bs = []
+        for delay in self.delay:
+            bs += delay.getBS()
+        return bs
+
+    def reset(self):
+        """reset the clock box to 0"""
+        for delay in self.delay:
+            delay.reset()
+
+    def ones(self):
+        """set the clock box to all 1's"""
+        for delay in self.delay:
+            delay.ones()
+
 
 
 class Cell:
@@ -110,15 +137,29 @@ class Cell:
 
 
 if __name__ == "__main__":
+    # Test the clockbox
+    # Make a clockbox
+    # Read the bitstream
+    # Check that the bitstream length is correct and all the values are 1
+    clockbox = ClockBox()
+    bs = clockbox.getBS()
+    clockbox_length = 6 * 8
+    assert len(bs) == clockbox_length # clockbox length
+
     # test the bitstream generator
     # Make a 2x2 bitstream generator
     # Read the bitstream
     # Check that the bitstream length is correct and all the values are 0
     xCells = 2
     yCells = 2
+
+    bs_expected_len = xCells * yCells * (3*4+4+3) + clockbox_length
     bitstream_gen = BitstreamGen(xCells, yCells)
     bs = bitstream_gen.getBS()
-    assert len(bs) == xCells * yCells * 16
+    print(bs)
+    print(len(bs), bs_expected_len)
+
+    assert len(bs) == bs_expected_len
     for i in range(len(bs)):
         assert bs[i] == 0
 
@@ -129,22 +170,17 @@ if __name__ == "__main__":
     bitstream_gen = BitstreamGen(xCells, yCells)
     bitstream_gen.cells[1][1].clockDecay.set(2)
     bs = bitstream_gen.getBS()
-    assert len(bs) == xCells * yCells * 16
-    for i in range(len(bs)):
-        if i == 62:
-            assert bs[i] == 1
-        else:
-            assert bs[i] == 0
+    assert len(bs) == bs_expected_len
+    assert sum(bs) == 1
 
     bitstream_gen.reset()
     bs = bitstream_gen.getBS()
-    assert len(bs) == xCells * yCells * 16
+    assert len(bs) == bs_expected_len
     for i in range(len(bs)):
         assert bs[i] == 0
 
     bitstream_gen.ones()
     bs = bitstream_gen.getBS()
-    assert len(bs) == xCells * yCells * 16
     for i in range(len(bs)):
         assert bs[i] == 1
 

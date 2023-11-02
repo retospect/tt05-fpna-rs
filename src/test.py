@@ -4,8 +4,8 @@ from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 from bitstream_gen import BitstreamGen
 
 # Must match paramter X_MAX and Y_MAX in tt_um_retospect_neurochip.v
-bitstream_x = 6
-bitstream_y = 6
+bitstream_x = 1 
+bitstream_y = 1
 
 
 def getBitstream():
@@ -91,6 +91,7 @@ async def reset(dut, bitstream):
 async def test_shiftreg(dut):
     bitstream = getBitstream()
     await reset(dut, bitstream)
+    print("After reset")
     await checkBitstream(dut, bitstream.getBS())
 
     # Reset_nn is high for a cycle, so all the uT values should be 
@@ -101,11 +102,13 @@ async def test_shiftreg(dut):
     reset_nn.value = 1
     await ClockCycles(dut.clk, 1)
     reset_nn.value = 0
-
+    
+    print("After reset_nn")
     await loadBitstream(dut, bitstream.getBS())
 
     bitstream.ones()
     bitstream.cells[0][0].uT.set(5)
     bitstream.cells[bitstream_x - 1][bitstream_y - 1].uT.set(3)
+    print("After ones")
     await loadBitstream(dut, bitstream.getBS())
     await checkBitstream(dut, bitstream.getBS())

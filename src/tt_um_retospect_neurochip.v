@@ -1,8 +1,8 @@
 `default_nettype none
 
 module tt_um_retospect_neurochip #(
-    parameter X_MAX = 6,
-    parameter Y_MAX = 6
+    parameter X_MAX = 1,
+    parameter Y_MAX = 1
 ) (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
@@ -38,11 +38,20 @@ module tt_um_retospect_neurochip #(
   assign uio_out[0] = 1;
 
   wire reset_nn = uio_in[0];
-
   wire [X_MAX*Y_MAX:0] bs_w;
-  assign bs_out  = bs_w[X_MAX*Y_MAX];
-  assign bs_w[0] = bs_in;
 
+  wire [7:0] clockbus;
+  retospect_clockbox clockbox (
+      config_en,
+      bs_in,
+      bs_w[0],  // bs_out
+      clk,
+      reset,
+      reset_nn,
+      clockbus
+  );
+
+  assign bs_w[0] = bs_in;
 
   generate
     genvar x, y;
@@ -55,12 +64,16 @@ module tt_um_retospect_neurochip #(
             bs_w[x*Y_MAX+y+1],
             clk,
             reset,
-	    reset_nn
+            reset_nn,
+            clockbus
         );
       end
     end
   endgenerate
 
+  assign bs_out = bs_w[X_MAX*Y_MAX];
+
+  // assign the output
   assign outbus = 10'b0000000000;
 
 endmodule
@@ -70,13 +83,15 @@ module retospect_cnb (
     input wire bs_in,
     output wire bs_out,
     input wire clk,
-    input wire reset, 
-    input wire reset_nn);
+    input wire reset,
+    input wire reset_nn,
+    output wire [7:0] clockbus
+);
   reg [2:0] w1, w2, w3, w4;
-  reg [3:0] uT;  
+  reg [3:0] uT;
   reg [2:0] clockDecaySelect;
 
-  always @(posedge clk or posedge reset or negedge reset_nn) begin
+  always @(posedge clk or posedge reset) begin
     if (reset) begin
       // Reset condition
       w1 <= 3'b0;
@@ -86,7 +101,7 @@ module retospect_cnb (
       uT <= 4'b0;  // Reset all 5 bits
       clockDecaySelect <= 3'b0;
     end else if (reset_nn) begin
-      uT <= 4'b1; // initial weight is 1 to enable "always firing" neurons
+      uT <= 4'b1;  // initial weight is 1 to enable "always firing" neurons
     end else if (config_en) begin
       // Shift the bits in the register: bs_in is the new bit
       // and bs_out is the old bit
@@ -104,3 +119,78 @@ module retospect_cnb (
   assign bs_out = clockDecaySelect[0];
 
 endmodule
+
+module retospect_clockbox (
+    input wire config_en,
+    input wire bs_in,
+    output wire bs_out,
+    input wire clk,
+    input wire reset,
+    input wire reset_nn,
+    output wire [7:0] clockbus
+);
+  // Clock module. It creats
+
+  assign clockbus[0] = 1'b0;
+  assign clockbus[1] = 1'b1;
+
+  reg [7:0] clock_max  [5:0];
+  reg [7:0] clock_count[5:0];
+
+  // when the clock is high and reset_nn is high, reset the clock_count to 0
+  // when reset is going to high, reset the clock_count to 0
+  // when reset is high, clock_count is 0
+  // when config_en is high, shift the bits through the clock_max registers
+  // when clock is going high and clock count is equal to clock_max, reset the clock_count to 0
+  //
+  always @(posedge clk) begin
+    if (reset) begin
+      // Reset condition
+      clock_max[0] <= 8'b00000000;
+      clock_max[1] <= 8'b00000000;
+      clock_max[2] <= 8'b00000000;
+      clock_max[3] <= 8'b00000000;
+      clock_max[4] <= 8'b00000000;
+      clock_max[5] <= 8'b00000000;
+      clock_count[0] <= 8'b00000000;
+      clock_count[1] <= 8'b00000000;
+      clock_count[2] <= 8'b00000000;
+      clock_count[3] <= 8'b00000000;
+      clock_count[4] <= 8'b00000000;
+      clock_count[5] <= 8'b00000000;
+    end else if (reset_nn) begin
+      clock_count[0] <= 8'b00000000;
+      clock_count[1] <= 8'b00000000;
+      clock_count[2] <= 8'b00000000;
+      clock_count[3] <= 8'b00000000;
+      clock_count[4] <= 8'b00000000;
+      clock_count[5] <= 8'b00000000;
+    end else if (config_en) begin
+      // Shift the bits in the register: bs_in is the new bit
+      // and bs_out is the old bit
+      // they pass thru w1, w2, w3, w4, uT, and clockDecaySelect in order
+      clock_max[0] <= {bs_in, clock_max[0][7:1]};
+      clock_max[1] <= {clock_max[0][0], clock_max[1][7:1]};
+      clock_max[2] <= {clock_max[1][0], clock_max[2][7:1]};
+      clock_max[3] <= {clock_max[2][0], clock_max[3][7:1]};
+      clock_max[4] <= {clock_max[3][0], clock_max[4][7:1]};
+      clock_max[5] <= {clock_max[4][0], clock_max[5][7:1]};
+    end else begin
+      clock_count[0] <= clock_count[0] + 1;
+      clock_count[1] <= clock_count[1] + 1;
+      clock_count[2] <= clock_count[2] + 1;
+      clock_count[3] <= clock_count[3] + 1;
+      clock_count[4] <= clock_count[4] + 1;
+      clock_count[5] <= clock_count[5] + 1;
+
+    end
+  end
+
+  // clockbus[2] to clockbus[7] are 1 if the corresponding clock_max and
+  // clock+count are equal
+
+  // bs_out is the last bit of the last clock_max register
+  assign bs_out = clock_max[5][0];
+
+endmodule
+
