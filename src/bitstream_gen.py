@@ -10,7 +10,7 @@ class BitstreamGen:
         self.xCells = xCells
         self.yCells = yCells
         # cells is a 3d array of cells
-        self.clockbox = ClockBox()  
+        self.clockbox = ClockBox()
         self.cells = []
         for x in range(xCells):
             self.cells.append([])
@@ -70,13 +70,13 @@ class Register:
         """get the array of bits representing the register"""
         return [int(x) for x in bin(self.value)[2:].zfill(self.length)]
 
+
 class ClockBox:
     def __init__(self):
         self.delay = []
         # add 6 8bit registers to the delay array
         for i in range(6):
             self.delay.append(Register(8, 0))
-        
 
     def getBS(self):
         """get the bitstream of the clock box"""
@@ -94,7 +94,6 @@ class ClockBox:
         """set the clock box to all 1's"""
         for delay in self.delay:
             delay.ones()
-
 
 
 class Cell:
@@ -144,7 +143,7 @@ if __name__ == "__main__":
     clockbox = ClockBox()
     bs = clockbox.getBS()
     clockbox_length = 6 * 8
-    assert len(bs) == clockbox_length # clockbox length
+    assert len(bs) == clockbox_length  # clockbox length
 
     # test the bitstream generator
     # Make a 2x2 bitstream generator
@@ -153,7 +152,7 @@ if __name__ == "__main__":
     xCells = 2
     yCells = 2
 
-    bs_expected_len = xCells * yCells * (3*4+4+3) + clockbox_length
+    bs_expected_len = xCells * yCells * (3 * 4 + 4 + 3) + clockbox_length
     bitstream_gen = BitstreamGen(xCells, yCells)
     bs = bitstream_gen.getBS()
     print(bs)
