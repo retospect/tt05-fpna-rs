@@ -55,12 +55,12 @@ module tt_um_retospect_neurochip #(
     genvar x, y;
     for (x = 0; x < X_MAX; x = x + 1) begin : gen_x_loop
       for (y = 0; y < Y_MAX; y = y + 1) begin : gen_y_loop
-	localparam int lin_idx = x * Y_MAX + y;
+        localparam int LinIdx = x * Y_MAX + y;
         // instantiate the cnb
         retospect_cnb cnb (
             .config_en(config_en),
-            .bs_in(bs_w[lin_idx]),
-            .bs_out(bs_w[lin_idx+1]),
+            .bs_in(bs_w[LinIdx]),
+            .bs_out(bs_w[LinIdx+1]),
             .clk(clk),
             .reset(reset),
             .reset_nn(reset_nn),
