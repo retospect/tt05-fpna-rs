@@ -78,16 +78,40 @@ module tt_um_retospect_neurochip #(
             .dendrite3(from_right[LinIdx]),
             .dendrite4(from_diagonal[LinIdx])
         );
+
+        // Wire up the from_right bits
         if (LinIdx == 0) begin : gen_from_right_rollover
           assign from_right[MaxLinIdx] = axon[LinIdx];
         end else begin : gen_from_right
           assign from_right[LinIdx-1] = axon[LinIdx];
         end
+
+        // Wire up the from_left bits
         if (LinIdx == MaxLinIdx) begin : gen_from_left_rollover
           assign from_left[0] = axon[LinIdx];
         end else begin : gen_from_left
           assign from_left[LinIdx+1] = axon[LinIdx];
         end
+
+        // Wire up the from_above bits
+        // This is a bit more complicated because we need to handle the
+        // case where we are at the top of the array
+        if (LinIdx < Y_MAX) begin : gen_from_above_top
+          assign from_above[LinIdx+MaxLinIdx-Y_MAX] = axon[LinIdx];
+        end else begin : gen_from_above
+          assign from_above[LinIdx-Y_MAX] = axon[LinIdx];
+        end
+
+        // Wire up the from_diagonal bits, which gets the input from cell
+        // below and to the left. 
+        // This is a bit more complicated because we need to handle the
+        // case where we are at the bottom of the array or on the left edge
+        // of the array
+        // We want to roll over to the top of the array when we are on the
+        // top row, and we want to roll over to the right edge of the array
+        // when we are on the left edge of the array
+
+
       end
     end
   endgenerate
