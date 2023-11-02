@@ -41,6 +41,10 @@ module tt_um_retospect_neurochip #(
   wire reset_nn = uio_in[0];
   wire [X_MAX*Y_MAX:0] bs_w;
   wire [X_MAX*Y_MAX:0] axon;
+  wire [X_MAX*Y_MAX:0] from_above;
+  wire [X_MAX*Y_MAX:0] from_left;
+  wire [X_MAX*Y_MAX:0] from_right;
+  wire [X_MAX*Y_MAX:0] from_diagonal;
 
   wire [7:0] clockbus;
   retospect_clockbox clockbox (
@@ -58,6 +62,7 @@ module tt_um_retospect_neurochip #(
     for (x = 0; x < X_MAX; x = x + 1) begin : gen_x_loop
       for (y = 0; y < Y_MAX; y = y + 1) begin : gen_y_loop
         localparam int LinIdx = x * Y_MAX + y;
+        localparam int MaxLinIdx = X_MAX * Y_MAX - 1;
         // instantiate the cnb
         retospect_cnb cnb (
             .config_en(config_en),
@@ -67,8 +72,22 @@ module tt_um_retospect_neurochip #(
             .reset(reset),
             .reset_nn(reset_nn),
             .clockbus(clockbus),
-            .axon(axon[LinIdx])
+            .axon(axon[LinIdx]),
+            .dendrite1(from_above[LinIdx]),
+            .dendrite2(from_left[LinIdx]),
+            .dendrite3(from_right[LinIdx]),
+            .dendrite4(from_diagonal[LinIdx])
         );
+        if (LinIdx == 0) begin : gen_from_right_rollover
+          assign from_right[MaxLinIdx] = axon[LinIdx];
+        end else begin : gen_from_right
+          assign from_right[LinIdx-1] = axon[LinIdx];
+        end
+        if (LinIdx == MaxLinIdx) begin : gen_from_left_rollover
+          assign from_left[0] = axon[LinIdx];
+        end else begin : gen_from_left
+          assign from_left[LinIdx+1] = axon[LinIdx];
+        end
       end
     end
   endgenerate
