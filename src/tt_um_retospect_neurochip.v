@@ -100,7 +100,7 @@ module retospect_cnb (
       uT <= 4'b0;  // Reset all 5 bits
       clockDecaySelect <= 3'b0;
     end else if (reset_nn) begin
-      uT <= 4'b1;  // initial weight is 1 to enable "always firing" neurons
+      uT <= 4'b0001;  // initial weight is 1 to enable "always firing" neurons
     end else if (config_en) begin
       // Shift the bits in the register: bs_in is the new bit
       // and bs_out is the old bit
@@ -130,8 +130,8 @@ module retospect_clockbox (
 );
   // Clock module. It creats
 
-  reg [7:0] clock_max  [0:5];
-  reg [7:0] clock_count[0:5];
+  reg [7:0] clock_max  [6];
+  reg [7:0] clock_count[6];
 
   // when the clock is high and reset_nn is high, reset the clock_count to 0
   // when reset is going to high, reset the clock_count to 0
