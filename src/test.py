@@ -4,8 +4,8 @@ from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 from bitstream_gen import BitstreamGen
 
 # Must match paramter X_MAX and Y_MAX in tt_um_retospect_neurochip.v
-bitstream_x = 1 
-bitstream_y = 1
+bitstream_x = 4 
+bitstream_y = 4
 
 
 def getBitstream():
