@@ -185,8 +185,19 @@ module retospect_clockbox (
     end
   end
 
+  // clockbus 0 = 0 (never decay)
+  // clockbus 1 = 1 (decay with each timestep)
   // clockbus[2] to clockbus[7] are 1 if the corresponding clock_max and
   // clock+count are equal
+  assign clockbus[0] = 1'b0;
+  assign clockbus[1] = 1'b1;
+  assign clockbus[2] = (clock_max[0] == clock_count[0]) ? 1'b1 : 1'b0;
+  assign clockbus[3] = (clock_max[1] == clock_count[1]) ? 1'b1 : 1'b0;
+  assign clockbus[4] = (clock_max[2] == clock_count[2]) ? 1'b1 : 1'b0;
+  assign clockbus[5] = (clock_max[3] == clock_count[3]) ? 1'b1 : 1'b0;
+  assign clockbus[6] = (clock_max[4] == clock_count[4]) ? 1'b1 : 1'b0;
+  assign clockbus[7] = (clock_max[5] == clock_count[5]) ? 1'b1 : 1'b0;
+
 
   // bs_out is the last bit of the last clock_max register
   assign bs_out = clock_max[5][0];
