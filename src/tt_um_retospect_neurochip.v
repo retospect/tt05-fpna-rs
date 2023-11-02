@@ -133,7 +133,9 @@ module retospect_cnb (
   end
 
   assign axon = uT[3];
-  // The output is the last bit of the register
+
+  // The bitstream output is the last bit of the register
+  assign bs_out = clockDecaySelect[0];
 
 endmodule
 
