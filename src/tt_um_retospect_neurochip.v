@@ -88,7 +88,11 @@ module retospect_cnb (
     input wire reset,
     input wire reset_nn,
     input wire [7:0] clockbus,
-    output wire axon
+    output wire axon,
+    input wire dendrite1,
+    input wire dendrite2,
+    input wire dendrite3,
+    input wire dendrite4
 );
   reg [2:0] w1, w2, w3, w4;
   reg [3:0] uT;
@@ -128,6 +132,18 @@ module retospect_cnb (
       end
       if (uT[3]) begin  // clear the overflow bit if it is set
         uT[3] <= 1'b0;
+      end
+      if (dendrite1) begin
+        uT <= uT + w1;
+      end
+      if (dendrite2) begin
+        uT <= uT + w2;
+      end
+      if (dendrite3) begin
+        uT <= uT + w3;
+      end
+      if (dendrite4) begin
+        uT <= uT + w4;
       end
     end
   end
