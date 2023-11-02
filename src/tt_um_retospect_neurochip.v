@@ -84,7 +84,7 @@ module retospect_cnb (
     input wire clk,
     input wire reset,
     input wire reset_nn,
-    output wire [7:0] clockbus
+    input wire [7:0] clockbus
 );
   reg [2:0] w1, w2, w3, w4;
   reg [3:0] uT;
