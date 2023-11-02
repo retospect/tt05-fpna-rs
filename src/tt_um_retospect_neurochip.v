@@ -146,12 +146,12 @@ module retospect_clockbox (
   always @(posedge clk) begin
     if (reset) begin
       // Reset condition
-      clock_max[0] <= 8'b00000000;
-      clock_max[1] <= 8'b00000000;
-      clock_max[2] <= 8'b00000000;
-      clock_max[3] <= 8'b00000000;
-      clock_max[4] <= 8'b00000000;
-      clock_max[5] <= 8'b00000000;
+      clock_max[0]   <= 8'b00000000;
+      clock_max[1]   <= 8'b00000000;
+      clock_max[2]   <= 8'b00000000;
+      clock_max[3]   <= 8'b00000000;
+      clock_max[4]   <= 8'b00000000;
+      clock_max[5]   <= 8'b00000000;
       clock_count[0] <= 8'b00000000;
       clock_count[1] <= 8'b00000000;
       clock_count[2] <= 8'b00000000;
@@ -190,7 +190,7 @@ module retospect_clockbox (
   // clock+count are equal
 
   // bs_out is the last bit of the last clock_max register
-  assign bs_out = 1;//clock_max[5][0];
+  assign bs_out = 1;  //clock_max[5][0];
 
 endmodule
 
