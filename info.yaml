@@ -93,7 +93,7 @@ documentation:
     - dendritic input 9
     - dendritic input 8 
 
-   references: |
+  references: |
       (1) [Eshraghian, Jason K., Max Ward, Emre Neftci, Xinxin Wang, Gregor Lenz, Girish Dwivedi, Mohammed Bennamoun, Doo Seok Jeong, and Wei D. Lu. 2023. “Training Spiking Neural Networks Using Lessons From Deep Learning.”](http://arxiv.org/abs/2109.12894)
 
 # The following fields are optional
