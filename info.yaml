@@ -49,34 +49,34 @@ documentation:
 
 # A description of what the inputs do (e.g. red button, SPI CLK, SPI MOSI, etc).
   inputs:               
-    - compare bit 11
-    - compare bit 12
-    - compare bit 13
-    - compare bit 14
-    - compare bit 15
-    - compare bit 16
-    - compare bit 17
-    - compare bit 18
+    - dendritic input 0
+    - dendritic input 1
+    - dendritic input 2
+    - dendritic input 3
+    - dendritic input 4
+    - dendritic input 5
+    - dendritic input 6
+    - dendritic input 7
 # A description of what the outputs do (e.g. status LED, SPI MISO, etc)
   outputs:
-    - segment a
-    - segment b
-    - segment c
-    - segment d
-    - segment e
-    - segment f
-    - segment g
-    - dot
+    - output axon 0
+    - output axon 1
+    - output axon 2
+    - output axon 3
+    - output axon 4
+    - output axon 5
+    - output axon 6
+    - output axon 7
 # A description of what the bidirectional I/O pins do (e.g. I2C SDA, I2C SCL, etc)
   bidirectional:
-    - second counter bit 0
-    - second counter bit 1
-    - second counter bit 2
-    - second counter bit 3
-    - second counter bit 4
-    - second counter bit 5
-    - second counter bit 6
-    - second counter bit 7
+    - reset neural network (active high)
+    - bitstream readout
+    - bitstream input
+    - config_en - shift bitstream
+    - output axon 8
+    - output axon 9
+    - dendritic input 9
+    - dendritic input 8 
 
 # The following fields are optional
   tag:          "timer, test"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
