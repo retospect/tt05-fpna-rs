@@ -56,15 +56,15 @@ module tt_um_retospect_neurochip #(
     for (x = 0; x < X_MAX; x = x + 1) begin : gen_x_loop
       for (y = 0; y < Y_MAX; y = y + 1) begin : gen_y_loop
         // instantiate the cnb
-	retospect_cnb cnb (
-	    .config_en(config_en),
-	    .bs_in(bs_w[x*Y_MAX+y]),
-	    .bs_out(bs_w[x*Y_MAX+y+1]),
-	    .clk(clk),
-	    .reset(reset),
-	    .reset_nn(reset_nn),
-	    .clockbus(clockbus)
-	);
+        retospect_cnb cnb (
+            .config_en(config_en),
+            .bs_in(bs_w[x*Y_MAX+y]),
+            .bs_out(bs_w[x*Y_MAX+y+1]),
+            .clk(clk),
+            .reset(reset),
+            .reset_nn(reset_nn),
+            .clockbus(clockbus)
+        );
       end
     end
   endgenerate
