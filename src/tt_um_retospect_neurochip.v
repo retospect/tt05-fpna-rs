@@ -130,9 +130,6 @@ module retospect_clockbox (
 );
   // Clock module. It creats
 
-  assign clockbus[0] = 1'b0;
-  assign clockbus[1] = 1'b1;
-
   reg [7:0] clock_max  [5:0];
   reg [7:0] clock_count[5:0];
 
@@ -175,12 +172,39 @@ module retospect_clockbox (
       clock_max[4] <= {clock_max[3][0], clock_max[4][7:1]};
       clock_max[5] <= {clock_max[4][0], clock_max[5][7:1]};
     end else begin
-      clock_count[0] <= clock_count[0] + 1;
-      clock_count[1] <= clock_count[1] + 1;
-      clock_count[2] <= clock_count[2] + 1;
-      clock_count[3] <= clock_count[3] + 1;
-      clock_count[4] <= clock_count[4] + 1;
-      clock_count[5] <= clock_count[5] + 1;
+      // if the clock_count is higher than the clock_max, reset the
+      // clock_count to 0
+      // otherwise, increment the clock_count
+      if (clock_count[0] > clock_max[0]) begin
+        clock_count[0] <= 8'b00000000;
+      end else begin
+        clock_count[0] <= clock_count[0] + 1;
+      end
+      if (clock_count[1] > clock_max[1]) begin
+        clock_count[1] <= 8'b00000000;
+      end else begin
+        clock_count[1] <= clock_count[1] + 1;
+      end
+      if (clock_count[2] > clock_max[2]) begin
+        clock_count[2] <= 8'b00000000;
+      end else begin
+        clock_count[2] <= clock_count[2] + 1;
+      end
+      if (clock_count[3] > clock_max[3]) begin
+        clock_count[3] <= 8'b00000000;
+      end else begin
+        clock_count[3] <= clock_count[3] + 1;
+      end
+      if (clock_count[4] > clock_max[4]) begin
+        clock_count[4] <= 8'b00000000;
+      end else begin
+        clock_count[4] <= clock_count[4] + 1;
+      end
+      if (clock_count[5] > clock_max[5]) begin
+        clock_count[5] <= 8'b00000000;
+      end else begin
+        clock_count[5] <= clock_count[5] + 1;
+      end
 
     end
   end
