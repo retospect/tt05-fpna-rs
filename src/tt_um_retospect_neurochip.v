@@ -1,7 +1,7 @@
 `default_nettype none
 
 module tt_um_retospect_neurochip 
-#( parameter BS_LENGTH = 256-1)
+#( parameter BS_LENGTH = 400-1)
 (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display

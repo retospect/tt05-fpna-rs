@@ -3,8 +3,8 @@ from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 from bitstream_gen import BitstreamGen
 
-bitstream_x = 4
-bitstream_y = 4
+bitstream_x = 6
+bitstream_y = 6
 
 
 def getBitstream():
@@ -53,6 +53,8 @@ async def checkBitstream(dut, bitstream):
     for i in range(len(bitstream)):
         await ClockCycles(dut.clk, 1)
         bit = bitstream[i]
+        # show the sequence id, the expected and the actual bit
+        dut._log.info("i: %d, expected: %d, actual: %d" % (i, bit, bs_out.value))
         assert bs_out.value == bit
     config_en.value = 0
     bs_in.value = 0
