@@ -22,23 +22,42 @@ yaml_version: 4
 # Here is a great example: https://github.com/davidsiaw/tt02-davidsiaw-stackcalc/blob/38c5647f83aad2aec675d566aa3d67b98f0aac81/info.yaml
 documentation: 
   author:       "Reto Stamm"      # Your name
-  title:        "Field Programmable Neuron Array"      # Project title
-  language:     "Verilog" # other examples include Verilog, Amaranth, VHDL, etc
-  description:  "An awesome FPNA."      # Short description of what your project does
+  title:        "Field Programmable Neural Array"      # Project title
+  language:     "Verilog, Python, PyTorch and SNNTorch" # other examples include Verilog, Amaranth, VHDL, etc
+  description:  "Field programmable neural array."      # Short description of what your project does
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
+      Neuromorphic neural nets are more power efficient than traditional machine learning. 
+      It replicates an array of leaky neurons, a simple structure that exists in the brain.
+      This design defines a Field Programmable Neural Array (FPNA). (1)
+      
+      A mental model for a leaky neuron is a capacitor that drains at some rate. 
+      It gets charged up by some amount (its weight) when an input (a dendrite) receives a pulse from somewhere else.
+      It sends a pulse (fire) its output (axon) when it reaches a specified level.
+
+      This circuit contains an array of interconnected, heavily simplified configurable neuron blocks (CNBs). 
+      Instead of continuous weights, we have three bits per weight.
+      Instead of a continuous decay of the charge in the capacitor, it halves at a somewhat configurable interval.
+      Each CNB has its own set of weights, and a somewhat configurable rate of decay.
+      In this design, each CNB had 4 inputs (dendrites), each with its own weight, one output (axon), and a choice of 8 different time decays. 
+      
       An array of neuromorphic CNBs (Configurable Neuron Blocks). Each CNB has a 
-      3 inputs, and 3 associated weights, that get added to its membrane potential. 
+      4 inputs, and each input has an associated weight, that get added to its membrane potential. 
       When a CNB fires, it sends a pulse to 3 of its neighbours.
       Each CNB is subscribed to one of 8 decay clock tools. 
 
-      Each CNB can be initialized with weights, the selection of its :
-      Uses a set of registers to divide the clock, and then some combinational logic
-      to convert from binary to decimal for the display.
+      The configuration data (Bitstream, or BS), including all the weights, the desired timing divisions, and the weights for each CNB are shifted in through the bs_in pin when the config_en pin is high.
+      The BS can be read back from the bs_out pin. 
 
-      An example on how to train a set of weights and other parameters for this tool is 
-      https://github.com/retospect/naxon .
+
+      The naxon tool is an example that shows how to train a neural network, generate all the relevant data and the BS that is needed to configure that model into this design
+      [https://github.com/retospect/naxon](https://github.com/retospect/naxon).
+
+      *References*
+
+      (1) [Eshraghian, Jason K., Max Ward, Emre Neftci, Xinxin Wang, Gregor Lenz, Girish Dwivedi, Mohammed Bennamoun, Doo Seok Jeong, and Wei D. Lu. 2023. “Training Spiking Neural Networks Using Lessons From Deep Learning.”](http://arxiv.org/abs/2109.12894)
+
 
 
 
@@ -69,9 +88,9 @@ documentation:
     - output axon 7
 # A description of what the bidirectional I/O pins do (e.g. I2C SDA, I2C SCL, etc)
   bidirectional:
-    - reset neural network (active high)
-    - bitstream readout
-    - bitstream input
+    - reset_nn reset neural network (active high)
+    - bs_in bitstream readout
+    - bs_out bitstream input
     - config_en - shift bitstream
     - output axon 8
     - output axon 9
