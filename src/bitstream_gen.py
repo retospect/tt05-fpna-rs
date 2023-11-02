@@ -36,6 +36,13 @@ class BitstreamGen:
                 bs += self.cells[x][y].getBS()
         return bs
 
+    def getAllCells(self):
+        """get a linearized array of all the cells"""
+        cells = []
+        for x in range(self.xCells):
+            for y in range(self.yCells):
+                yield self.cells[x][y]
+
 
 class Register:
     def __init__(self, length, initValue=0):

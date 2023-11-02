@@ -1,8 +1,8 @@
 `default_nettype none
 
 module tt_um_retospect_neurochip #(
-    parameter X_MAX = 1,
-    parameter Y_MAX = 1
+    parameter X_MAX = 6,
+    parameter Y_MAX = 6
 ) (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
@@ -54,7 +54,8 @@ module tt_um_retospect_neurochip #(
             bs_w[x*Y_MAX+y],
             bs_w[x*Y_MAX+y+1],
             clk,
-            reset
+            reset,
+	    reset_nn
         );
       end
     end
@@ -69,13 +70,13 @@ module retospect_cnb (
     input wire bs_in,
     output wire bs_out,
     input wire clk,
-    input wire reset);
-
+    input wire reset, 
+    input wire reset_nn);
   reg [2:0] w1, w2, w3, w4;
   reg [3:0] uT;  
   reg [2:0] clockDecaySelect;
 
-  always @(posedge clk or posedge reset) begin
+  always @(posedge clk or posedge reset or negedge reset_nn) begin
     if (reset) begin
       // Reset condition
       w1 <= 3'b0;
@@ -84,6 +85,8 @@ module retospect_cnb (
       w4 <= 3'b0;
       uT <= 4'b0;  // Reset all 5 bits
       clockDecaySelect <= 3'b0;
+    end else if (reset_nn) begin
+      uT <= 4'b1; // initial weight is 1 to enable "always firing" neurons
     end else if (config_en) begin
       // Shift the bits in the register: bs_in is the new bit
       // and bs_out is the old bit

@@ -93,6 +93,17 @@ async def test_shiftreg(dut):
     await reset(dut, bitstream)
     await checkBitstream(dut, bitstream.getBS())
 
+    # Reset_nn is high for a cycle, so all the uT values should be 
+    # set to 1
+    for cell in bitstream.getAllCells():
+        cell.uT.set(1)
+    reset_nn = dut.uio_in[0]
+    reset_nn.value = 1
+    await ClockCycles(dut.clk, 1)
+    reset_nn.value = 0
+
+    await loadBitstream(dut, bitstream.getBS())
+
     bitstream.ones()
     bitstream.cells[0][0].uT.set(5)
     bitstream.cells[bitstream_x - 1][bitstream_y - 1].uT.set(3)
