@@ -13,8 +13,8 @@ module tt_um_retospect_neurochip #(
     input  wire       clk,      // clock
     input  wire       rst_n     // reset_n - low to reset
 );
-
-  wire reset = !rst_n;
+ 
+  wire reset = !rst_n & ena;
 
   // use bidirectionals as outputs
   assign uio_oe = 8'b11000010;
