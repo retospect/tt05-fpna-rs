@@ -190,7 +190,7 @@ module retospect_clockbox (
   // clock+count are equal
 
   // bs_out is the last bit of the last clock_max register
-  assign bs_out = clock_max[5][0];
+  assign bs_out = 1;//clock_max[5][0];
 
 endmodule
 
