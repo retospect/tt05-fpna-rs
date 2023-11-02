@@ -68,6 +68,7 @@ class Cell:
         self.w1 = Register(3)
         self.w2 = Register(3)
         self.w3 = Register(3)
+        self.w4 = Register(3)
         self.uT = Register(4)
         self.clockDecay = Register(3)
 
@@ -77,6 +78,7 @@ class Cell:
             self.w1.getBS()
             + self.w2.getBS()
             + self.w3.getBS()
+            + self.w4.getBS()
             + self.uT.getBS()
             + self.clockDecay.getBS()
         )
@@ -86,6 +88,7 @@ class Cell:
         self.w1.reset()
         self.w2.reset()
         self.w3.reset()
+        self.w4.reset()
         self.uT.reset()
         self.clockDecay.reset()
 
@@ -94,6 +97,7 @@ class Cell:
         self.w1.ones()
         self.w2.ones()
         self.w3.ones()
+        self.w4.ones()
         self.uT.ones()
         self.clockDecay.ones()
 
