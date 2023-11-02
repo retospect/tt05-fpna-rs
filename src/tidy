@@ -1,0 +1,3 @@
+black .
+verible-verilog-format tt_um_retospect_neurochip.v > tmp
+mv tmp tt_um_retospect_neurochip.v
