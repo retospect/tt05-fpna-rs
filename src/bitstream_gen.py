@@ -155,8 +155,6 @@ if __name__ == "__main__":
     bs_expected_len = xCells * yCells * (3 * 4 + 4 + 3) + clockbox_length
     bitstream_gen = BitstreamGen(xCells, yCells)
     bs = bitstream_gen.getBS()
-    print(bs)
-    print(len(bs), bs_expected_len)
 
     assert len(bs) == bs_expected_len
     for i in range(len(bs)):
@@ -183,4 +181,4 @@ if __name__ == "__main__":
     for i in range(len(bs)):
         assert bs[i] == 1
 
-    print("All tests passed.")
+    print("All python bitstream generation tests passed.")

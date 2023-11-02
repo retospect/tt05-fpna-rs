@@ -40,6 +40,7 @@ module tt_um_retospect_neurochip #(
 
   wire reset_nn = uio_in[0];
   wire [X_MAX*Y_MAX:0] bs_w;
+  wire [X_MAX*Y_MAX:0] axon;
 
   wire [7:0] clockbus;
   retospect_clockbox clockbox (
@@ -65,7 +66,8 @@ module tt_um_retospect_neurochip #(
             .clk(clk),
             .reset(reset),
             .reset_nn(reset_nn),
-            .clockbus(clockbus)
+            .clockbus(clockbus),
+            .axon(axon[LinIdx])
         );
       end
     end
@@ -85,11 +87,15 @@ module retospect_cnb (
     input wire clk,
     input wire reset,
     input wire reset_nn,
-    input wire [7:0] clockbus
+    input wire [7:0] clockbus,
+    output wire axon
 );
   reg [2:0] w1, w2, w3, w4;
   reg [3:0] uT;
   reg [2:0] clockDecaySelect;
+
+  wire my_decay;
+  assign my_decay = clockbus[clockDecaySelect];
 
   always @(posedge clk) begin
     if (reset) begin
@@ -112,11 +118,22 @@ module retospect_cnb (
       w4 <= {w3[0], w4[2:1]};
       uT <= {w4[0], uT[3:1]};  // Shifting the entire 5-bit register
       clockDecaySelect <= {uT[0], clockDecaySelect[2:1]};
+    end else begin
+      // Shift the bits in the register: bs_in is the new bit
+      // and bs_out is the old bit
+      // they pass thru w1, w2, w3, w4, uT, and clockDecaySelect in order
+      if (my_decay) begin  // if the decay clock comes around, divide by half.
+        // otherwise do nothing
+        uT <= {uT[3:1], 1'b0};
+      end
+      if (uT[3]) begin  // clear the overflow bit if it is set
+        uT[3] <= 1'b0;
+      end
     end
   end
 
+  assign axon = uT[3];
   // The output is the last bit of the register
-  assign bs_out = clockDecaySelect[0];
 
 endmodule
 
