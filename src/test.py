@@ -54,7 +54,7 @@ async def checkBitstream(dut, bitstream):
         await ClockCycles(dut.clk, 1)
         bit = bitstream[i]
         # show the sequence id, the expected and the actual bit
-        dut._log.info("i: %d, expected: %d, actual: %d" % (i, bit, bs_out.value))
+        #dut._log.info("i: %d, expected: %d, actual: %d" % (i, bit, bs_out.value))
         assert bs_out.value == bit
     config_en.value = 0
     bs_in.value = 0
