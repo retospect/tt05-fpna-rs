@@ -58,7 +58,7 @@ async def checkBitstream(dut, bitstream):
         # note that the bs_out.value can be a number or a string
         # if it is a string, it is likely the string "z"
         print("%d: %d %s" % (i, bit, bs_out.value))
-        #assert bs_out.value == bit
+        assert bs_out.value == bit
     config_en.value = 0
     bs_in.value = 0
 

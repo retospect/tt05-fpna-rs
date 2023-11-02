@@ -51,7 +51,6 @@ module tt_um_retospect_neurochip #(
       clockbus
   );
 
-  assign bs_w[0] = bs_in;
 
   generate
     genvar x, y;
@@ -190,7 +189,7 @@ module retospect_clockbox (
   // clock+count are equal
 
   // bs_out is the last bit of the last clock_max register
-  assign bs_out = clock_max[0][0];
+  assign bs_out = clock_max[5][0];
 
 endmodule
 
