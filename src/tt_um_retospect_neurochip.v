@@ -90,7 +90,7 @@ module retospect_cnb (
   reg [3:0] uT;
   reg [2:0] clockDecaySelect;
 
-  always @(posedge clk or posedge reset) begin
+  always @(posedge clk) begin
     if (reset) begin
       // Reset condition
       w1 <= 3'b0;
