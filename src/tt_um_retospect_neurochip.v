@@ -1,8 +1,8 @@
 `default_nettype none
 
 module tt_um_retospect_neurochip #(
-    parameter X_MAX = 4,
-    parameter Y_MAX = 4
+    parameter integer X_MAX = 5,
+    parameter integer Y_MAX = 5
 ) (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
@@ -19,10 +19,10 @@ module tt_um_retospect_neurochip #(
   // use bidirectionals as outputs
   assign uio_oe = 8'b11000010;
 
-  wire [0:9] inbus;
+  wire [9:0] inbus;
   assign inbus = {ui_in[7:0], uio_in[7:6]};
 
-  wire [0:9] outbus;
+  wire [9:0] outbus;
   assign {uo_out[7:0], uio_out[5:4]} = outbus;
 
   wire config_en = uio_in[3];
@@ -130,8 +130,8 @@ module retospect_clockbox (
 );
   // Clock module. It creats
 
-  reg [7:0] clock_max  [5:0];
-  reg [7:0] clock_count[5:0];
+  reg [7:0] clock_max  [0:5];
+  reg [7:0] clock_count[0:5];
 
   // when the clock is high and reset_nn is high, reset the clock_count to 0
   // when reset is going to high, reset the clock_count to 0
