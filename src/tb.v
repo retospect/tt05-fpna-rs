@@ -23,6 +23,11 @@ module tb ();
     reg  [7:0] ui_in;
     reg  [7:0] uio_in;
 
+    wire reset_nn = uio_in[0];
+    wire bs_out	= uio_out[1];
+    wire bs_in = uio_in[2];
+    wire config_en = uio_in[3];
+
     wire [7:0] uo_out;
     wire [7:0] uio_out;
     wire [7:0] uio_oe;
