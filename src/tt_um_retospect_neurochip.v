@@ -52,6 +52,9 @@ module tt_um_retospect_neurochip #(
   // from the cell to the right (or the left edge of the array,
   // for the right one)
   wire [X_MAX*Y_MAX:0] from_right;
+  // from the cell below
+  // or the top of the array, for the bottom one
+  wire [X_MAX*Y_MAX:0] from_below;
 
   wire [7:0] clockbus;
   retospect_clockbox clockbox (
@@ -82,8 +85,8 @@ module tt_um_retospect_neurochip #(
             .axon(axon[LinIdx]),
             .dendrite1(from_above[LinIdx]),
             .dendrite2(from_left[LinIdx]),
-            .dendrite3(from_right[LinIdx])  //,
-            //.dendrite4(from_diagonal[LinIdx])
+            .dendrite3(from_right[LinIdx]),
+            .dendrite4(from_below[LinIdx])
         );
 
         // Wire up the from_right bits
@@ -109,16 +112,14 @@ module tt_um_retospect_neurochip #(
           assign from_above[LinIdx-Y_MAX] = axon[LinIdx];
         end
 
-        // Wire up the from_diagonal bits, which gets the input from cell
-        // below and to the left.
+        // Wire up the from_below bits
         // This is a bit more complicated because we need to handle the
-        // case where we are at the bottom of the array or on the left edge
-        // of the array
-        // We want to roll over to the top of the array when we are on the
-        // top row, and we want to roll over to the right edge of the array
-        // when we are on the left edge of the array
-
-
+        // case where we are at the bottom of the array
+        if (LinIdx >= MaxLinIdx - Y_MAX) begin : gen_from_below_bottom
+          assign from_below[LinIdx-Y_MAX+1] = axon[LinIdx];
+        end else begin : gen_from_below
+          assign from_below[LinIdx+Y_MAX] = axon[LinIdx];
+        end
       end
     end
   endgenerate
