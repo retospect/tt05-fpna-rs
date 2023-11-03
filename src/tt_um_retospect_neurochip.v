@@ -92,34 +92,34 @@ module tt_um_retospect_neurochip #(
 
         // Wire up the from_right bits
         if (LinIdx == 0) begin : gen_from_right_rollover
-          assign from_right[MaxLinIdx] = axon[LinIdx];
+          assign from_right[LinIdx] = axon[MaxLinIdx];
         end else begin : gen_from_right
-          assign from_right[LinIdx-1] = axon[LinIdx];
+          assign from_right[LinIdx] = axon[LinIdx-1];
         end
 
         // Wire up the from_left bits
         if (LinIdx == MaxLinIdx) begin : gen_from_left_rollover
-          assign from_left[0] = axon[LinIdx];
+          assign from_left[LinIdx] = axon[0];
         end else begin : gen_from_left
-          assign from_left[LinIdx+1] = axon[LinIdx];
+          assign from_left[LinIdx] = axon[LinIdx+1];
         end
 
         // Wire up the from_above bits
         // This is a bit more complicated because we need to handle the
         // case where we are at the top of the array
         if (LinIdx < Y_MAX) begin : gen_from_above_top
-          assign from_above[LinIdx+MaxLinIdx-Y_MAX] = axon[LinIdx];
+          assign from_above[LinIdx] = axon[LinIdx+MaxLinIdx-Y_MAX+1];
         end else begin : gen_from_above
-          assign from_above[LinIdx-Y_MAX] = axon[LinIdx];
+          assign from_above[LinIdx] = axon[LinIdx-Y_MAX];
         end
 
         // Wire up the from_below bits
         // This is a bit more complicated because we need to handle the
         // case where we are at the bottom of the array
         if (LinIdx >= MaxLinIdx - Y_MAX) begin : gen_from_below_bottom
-          assign from_below[LinIdx-Y_MAX+1] = axon[LinIdx];
+          assign from_below[LinIdx] = axon[LinIdx-(MaxLinIdx-Y_MAX+1)];
         end else begin : gen_from_below
-          assign from_below[LinIdx+Y_MAX] = axon[LinIdx];
+          assign from_below[LinIdx] = axon[LinIdx+Y_MAX];
         end
 
         // Hook up the outputs
@@ -128,6 +128,9 @@ module tt_um_retospect_neurochip #(
         localparam int SPACING = MaxLinIdx / NUM_OUTPUTS;
         if (LinIdx % SPACING == 0) begin : gen_output
           if (LinIdx / SPACING < NUM_OUTPUTS) begin : gen_make_output
+            // print out which xy coordinates this output is from
+            // this is useful for debugging and bitstream generation
+            //$display("Output %d is from x=%d, y=%d", LinIdx/SPACING, x, y);
             assign outbus[LinIdx/SPACING] = axon[LinIdx];
           end
         end
