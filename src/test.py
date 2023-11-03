@@ -45,9 +45,12 @@ async def checkBitstream(dut, bitstream):
     """check the shift register against the expected bitstream"""
     isBitstream(bitstream)
 
-    dut.bs_in.value = 0
+    config_en = dut.uio_in[3]
+    bs_in = dut.uio_in[2]
+    bs_out = dut.uio_out[1]
+    bs_in.value = 0
 
-    dut.config_en.value = 1
+    config_en.value = 1
 
     for i in range(len(bitstream)):
         await ClockCycles(dut.clk, 1)
@@ -56,9 +59,9 @@ async def checkBitstream(dut, bitstream):
         # note that the bs_out.value can be a number or a string
         # if it is a string, it is likely the string "z"
         # print("%d: %d %s" % (i, bit, bs_out.value))
-        assert dut.bs_out.value == bit
-    dut.config_en.value = 0
-    dut.bs_in.value = 0
+        assert bs_out.value == bit
+    config_en.value = 0
+    bs_in.value = 0
 
 
 async def reset(dut, bitstream):
