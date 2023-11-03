@@ -224,7 +224,10 @@ module retospect_cnb (
 
 endmodule
 
-module retospect_clockbox (
+module retospect_clockbox #(
+    parameter integer CLK_COUNT = 6
+)  // and 0, 1 are on the first two lines, then we have CLK_COUNT more with actual counters
+(
     input wire config_en,
     input wire bs_in,
     output wire bs_out,
@@ -233,10 +236,10 @@ module retospect_clockbox (
     input wire reset_nn,
     output wire [7:0] clockbus
 );
-  // Clock module. It creats
+  // Clock module. It creates various clock signals
 
-  reg [7:0] clock_max  [6];
-  reg [7:0] clock_count[6];
+  reg [7:0] clock_max  [CLK_COUNT];
+  reg [7:0] clock_count[CLK_COUNT];
 
   // when the clock is high and reset_nn is high, reset the clock_count to 0
   // when reset is going to high, reset the clock_count to 0
@@ -247,70 +250,33 @@ module retospect_clockbox (
   always @(posedge clk) begin
     if (reset) begin
       // Reset condition
-      clock_max[0]   <= 8'b00000000;
-      clock_max[1]   <= 8'b00000000;
-      clock_max[2]   <= 8'b00000000;
-      clock_max[3]   <= 8'b00000000;
-      clock_max[4]   <= 8'b00000000;
-      clock_max[5]   <= 8'b00000000;
-      clock_count[0] <= 8'b00000000;
-      clock_count[1] <= 8'b00000000;
-      clock_count[2] <= 8'b00000000;
-      clock_count[3] <= 8'b00000000;
-      clock_count[4] <= 8'b00000000;
-      clock_count[5] <= 8'b00000000;
+      for (integer i = 0; i < CLK_COUNT; i = i + 1) begin
+        clock_max[i]   <= 8'b00000000;
+        clock_count[i] <= 8'b00000000;
+      end
     end else if (reset_nn) begin
-      clock_count[0] <= 8'b00000000;
-      clock_count[1] <= 8'b00000000;
-      clock_count[2] <= 8'b00000000;
-      clock_count[3] <= 8'b00000000;
-      clock_count[4] <= 8'b00000000;
-      clock_count[5] <= 8'b00000000;
+      for (integer i = 0; i < CLK_COUNT; i = i + 1) begin
+        clock_count[i] <= 8'b00000000;
+      end
     end else if (config_en) begin
       // Shift the bits in the register: bs_in is the new bit
       // and bs_out is the old bit
       // they pass thru w1, w2, w3, w4, uT, and clockDecaySelect in order
       clock_max[0] <= {bs_in, clock_max[0][7:1]};
-      clock_max[1] <= {clock_max[0][0], clock_max[1][7:1]};
-      clock_max[2] <= {clock_max[1][0], clock_max[2][7:1]};
-      clock_max[3] <= {clock_max[2][0], clock_max[3][7:1]};
-      clock_max[4] <= {clock_max[3][0], clock_max[4][7:1]};
-      clock_max[5] <= {clock_max[4][0], clock_max[5][7:1]};
+      for (integer i = 1; i < CLK_COUNT; i = i + 1) begin
+        clock_max[i] <= {clock_max[i-1][0], clock_max[i][7:1]};
+      end
     end else begin
       // if the clock_count is higher than the clock_max, reset the
       // clock_count to 0
       // otherwise, increment the clock_count
-      if (clock_count[0] > clock_max[0]) begin
-        clock_count[0] <= 8'b00000000;
-      end else begin
-        clock_count[0] <= clock_count[0] + 1;
+      for (integer i = 0; i < CLK_COUNT; i = i + 1) begin
+        if (clock_count[i] > clock_max[i]) begin  // if it is higher than the max, reset
+          clock_count[i] <= 8'b00000000;
+        end else begin
+          clock_count[i] <= clock_count[i] + 1;  // otherwise increment
+        end
       end
-      if (clock_count[1] > clock_max[1]) begin
-        clock_count[1] <= 8'b00000000;
-      end else begin
-        clock_count[1] <= clock_count[1] + 1;
-      end
-      if (clock_count[2] > clock_max[2]) begin
-        clock_count[2] <= 8'b00000000;
-      end else begin
-        clock_count[2] <= clock_count[2] + 1;
-      end
-      if (clock_count[3] > clock_max[3]) begin
-        clock_count[3] <= 8'b00000000;
-      end else begin
-        clock_count[3] <= clock_count[3] + 1;
-      end
-      if (clock_count[4] > clock_max[4]) begin
-        clock_count[4] <= 8'b00000000;
-      end else begin
-        clock_count[4] <= clock_count[4] + 1;
-      end
-      if (clock_count[5] > clock_max[5]) begin
-        clock_count[5] <= 8'b00000000;
-      end else begin
-        clock_count[5] <= clock_count[5] + 1;
-      end
-
     end
   end
 
@@ -320,16 +286,15 @@ module retospect_clockbox (
   // clock+count are equal
   assign clockbus[0] = 1'b0;
   assign clockbus[1] = 1'b1;
-  assign clockbus[2] = (clock_max[0] == clock_count[0]) ? 1'b1 : 1'b0;
-  assign clockbus[3] = (clock_max[1] == clock_count[1]) ? 1'b1 : 1'b0;
-  assign clockbus[4] = (clock_max[2] == clock_count[2]) ? 1'b1 : 1'b0;
-  assign clockbus[5] = (clock_max[3] == clock_count[3]) ? 1'b1 : 1'b0;
-  assign clockbus[6] = (clock_max[4] == clock_count[4]) ? 1'b1 : 1'b0;
-  assign clockbus[7] = (clock_max[5] == clock_count[5]) ? 1'b1 : 1'b0;
-
+  generate
+    genvar i;
+    for (i = 0; i < CLK_COUNT; i = i + 1) begin : gen_clockbus_by_compare
+      assign clockbus[i+2] = (clock_max[i] == clock_count[i]) ? 1'b1 : 1'b0;
+    end
+  endgenerate
 
   // bs_out is the last bit of the last clock_max register
-  assign bs_out = clock_max[5][0];
+  assign bs_out = clock_max[CLK_COUNT-1][0];
 
 endmodule
 
