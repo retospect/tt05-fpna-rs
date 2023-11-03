@@ -5,7 +5,7 @@ from bitstream_gen import BitstreamGen
 
 # Must match paramter X_MAX and Y_MAX in tt_um_retospect_neurochip.v
 bitstream_x = 5
-bitstream_y = 12
+bitstream_y = 11
 
 
 def getBitstream():

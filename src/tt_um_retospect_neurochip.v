@@ -2,7 +2,7 @@
 
 module tt_um_retospect_neurochip #(
     parameter integer X_MAX = 5,
-    parameter integer Y_MAX = 12,
+    parameter integer Y_MAX = 11,
     parameter integer NUM_OUTPUTS = 10,
     parameter integer NUM_INPUTS = 10
 ) (
