@@ -94,7 +94,6 @@ documentation:
     - dendritic input 9
     - dendritic input 8 
 
-
 # The following fields are optional
   tag:          "neuromorphic, neuron, ml, ai, fpna, cnb, neural"      # comma separated list of tags: test, encryption, experiment, clock, animation, utility, industrial, pwm, fpga, alu, microprocessor, risc, riscv, sensor, signal generator, fft, filter, music, bcd, sound, serial, timer, random number generator, calculator, decoder, counter, puzzle, multiplier, game, oscillator,
   external_hw:  ""      # Describe any external hardware needed
@@ -102,3 +101,4 @@ documentation:
   doc_link:     ""      # URL to longer form documentation, eg the README.md in your repository
   clock_hz:     10000000       # Clock frequency in Hz (if required)
   picture:      "img/diagram.png"      # relative path to a picture in your repository (must be 512kb or less)
+  caption:      "Chicken"
