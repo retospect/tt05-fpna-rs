@@ -4,8 +4,8 @@ from cocotb.triggers import RisingEdge, FallingEdge, Timer, ClockCycles
 from bitstream_gen import BitstreamGen
 
 # Must match paramter X_MAX and Y_MAX in tt_um_retospect_neurochip.v
-bitstream_x = 5
-bitstream_y = 5
+bitstream_x = 7
+bitstream_y = 7
 
 
 def getBitstream():
@@ -66,6 +66,10 @@ async def checkBitstream(dut, bitstream):
 
 async def reset(dut, bitstream):
     """Initialize the device and load the provided bitstream"""
+    # zero out all inputs
+    for i in range(8):
+        dut.uio_in[i].value = 0
+        dut.ui_in[i].value = 0
     config_en = dut.uio_in[3]
 
     dut._log.info("start")
