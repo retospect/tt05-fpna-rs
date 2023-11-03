@@ -39,12 +39,11 @@ module tt_um_retospect_neurochip #(
          clockbus[3] & clockbus[4] & clockbus[5] & clockbus[6] & clockbus[7];
 
   wire reset_nn = uio_in[0];
-  wire [X_MAX*Y_MAX:0] bs_w;
-  wire [X_MAX*Y_MAX:0] axon;
-  wire [X_MAX*Y_MAX:0] from_above;
-  wire [X_MAX*Y_MAX:0] from_left;
-  wire [X_MAX*Y_MAX:0] from_right;
-  wire [X_MAX*Y_MAX:0] from_diagonal;
+  wire [X_MAX*Y_MAX:0] bs_w;  // bitstream wires - one for each cell and an extra for the output
+  wire [X_MAX*Y_MAX:0] axon;  // axon wires - one for each cell
+  wire [X_MAX*Y_MAX:0] from_above; // from the cell above (or the bottom of the array, for the top one)
+  wire [X_MAX*Y_MAX:0] from_left; // from the cell to the left (or the right edge of the array, for the left one)
+  wire [X_MAX*Y_MAX:0] from_right; // from the cell to the right (or the left edge of the array, for the right one)
 
   wire [7:0] clockbus;
   retospect_clockbox clockbox (
@@ -75,8 +74,8 @@ module tt_um_retospect_neurochip #(
             .axon(axon[LinIdx]),
             .dendrite1(from_above[LinIdx]),
             .dendrite2(from_left[LinIdx]),
-            .dendrite3(from_right[LinIdx]),
-            .dendrite4(from_diagonal[LinIdx])
+            .dendrite3(from_right[LinIdx])  //,
+            //.dendrite4(from_diagonal[LinIdx])
         );
 
         // Wire up the from_right bits
