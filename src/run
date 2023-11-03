@@ -8,5 +8,4 @@ echo "cd src; make" | docker run -i --rm --mount src="$(pwd)",target=/src,type=b
 # tinytapeout: Use that imate (if it causes an error, ``docker build -t tinytapeout .`` will build it. 
 # /bin/bash: run the commands from echo in the bash shell
 verible-verilog-lint tt_um_retospect_neurochip.v
-
 python bitstream_gen.py
