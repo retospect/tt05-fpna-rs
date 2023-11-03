@@ -24,7 +24,7 @@ documentation:
   author:       "Reto Stamm"      # Your name
   title:        "Field Programmable Neural Array"      # Project title
   language:     "Verilog, Python, PyTorch and SNNTorch" # other examples include Verilog, Amaranth, VHDL, etc
-  description:  "Field programmable neural array."      # Short description of what your project does
+  description:  "A collection of simulated leaky neurons that can be programmed to do computational tasks."      # Short description of what your project does
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
@@ -33,7 +33,7 @@ documentation:
       This design defines a Field Programmable Neural Array (FPNA). (1)
       
       A mental model for a leaky neuron is a capacitor that drains at some rate. 
-      It gets charged up by some amount (its weight) when an input (a dendrite) receives a pulse from somewhere else.
+      It gets charged up by some amount (its weight) whenever an input (a dendrite) receives a pulse from somewhere else.
       It sends a pulse (fire) its output (axon) when it reaches a specified level.
 
       This circuit contains an array of interconnected, heavily simplified configurable neuron blocks (CNBs). 
@@ -43,9 +43,11 @@ documentation:
       In this design, each CNB had 4 inputs (dendrites), each with its own weight, one output (axon), and a choice of 8 different time decays. 
       
       An array of neuromorphic CNBs (Configurable Neuron Blocks). Each CNB has a 
-      4 inputs, and each input has an associated weight, that get added to its membrane potential. 
-      When a CNB fires, it sends a pulse to 3 of its neighbours.
+      4 inputs, and each input has an associated weight that gets added to the CNBs membrane potential whenever the relevant input fires. 
+      When a CNB reaches a treshhold (rolls over, in this case), it fires and sends a pulse to 3 of its neighbours.
       Each CNB is subscribed to one of 8 decay clock tools. 
+
+      $\frac{chicken}{dog}$
 
       The configuration data (Bitstream, or BS), including all the weights, the desired timing divisions, and the weights for each CNB are shifted in through the bs_in pin when the config_en pin is high.
       The BS can be read back from the bs_out pin. 
