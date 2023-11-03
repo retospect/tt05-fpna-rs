@@ -6,11 +6,11 @@
 
 
 class BitstreamGen:
-    def __init__(self, xCells, yCells):
+    def __init__(self, xCells, yCells, clock_counters):
         self.xCells = xCells
         self.yCells = yCells
         # cells is a 3d array of cells
-        self.clockbox = ClockBox()
+        self.clockbox = ClockBox(clock_counters)
         self.cells = []
         for x in range(xCells):
             self.cells.append([])
@@ -72,8 +72,9 @@ class Register:
 
 
 class ClockBox:
-    def __init__(self):
+    def __init__(self, clock_counters):
         self.delay = []
+        self.counter = []
         # add 6 8bit registers to the delay array
         for i in range(6):
             self.delay.append(Register(8, 0))
@@ -140,7 +141,7 @@ if __name__ == "__main__":
     # Make a clockbox
     # Read the bitstream
     # Check that the bitstream length is correct and all the values are 1
-    clockbox = ClockBox()
+    clockbox = ClockBox(5)
     bs = clockbox.getBS()
     clockbox_length = 6 * 8
     assert len(bs) == clockbox_length  # clockbox length
@@ -153,7 +154,7 @@ if __name__ == "__main__":
     yCells = 2
 
     bs_expected_len = xCells * yCells * (3 * 4 + 4 + 3) + clockbox_length
-    bitstream_gen = BitstreamGen(xCells, yCells)
+    bitstream_gen = BitstreamGen(xCells, yCells, 6)
     bs = bitstream_gen.getBS()
 
     assert len(bs) == bs_expected_len
@@ -164,7 +165,7 @@ if __name__ == "__main__":
     # Set the value of the 2,2 clock decay to 7
     # Read the bitstream
     # Check that the bitstream length is correct and all the values are, except for the clock decay
-    bitstream_gen = BitstreamGen(xCells, yCells)
+    bitstream_gen = BitstreamGen(xCells, yCells, 6)
     bitstream_gen.cells[1][1].clockDecay.set(2)
     bs = bitstream_gen.getBS()
     assert len(bs) == bs_expected_len
