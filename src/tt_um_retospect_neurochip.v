@@ -134,6 +134,7 @@ module tt_um_retospect_neurochip #(
             assign outbus[LinIdx/SPACING] = axon[LinIdx];
           end
         end
+
       end
     end
   endgenerate
