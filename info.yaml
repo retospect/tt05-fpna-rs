@@ -101,4 +101,3 @@ documentation:
   doc_link:     ""      # URL to longer form documentation, eg the README.md in your repository
   clock_hz:     10000000       # Clock frequency in Hz (if required)
   picture:      "img/diagram.png"      # relative path to a picture in your repository (must be 512kb or less)
-  caption:      "Chicken"
