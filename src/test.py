@@ -113,3 +113,8 @@ async def test_shiftreg(dut):
     print("After ones")
     await loadBitstream(dut, bitstream.getBS())
     await checkBitstream(dut, bitstream.getBS())
+
+
+@cocotb.test()
+async def test_other(dut):
+    bitstream = getBitstream()
