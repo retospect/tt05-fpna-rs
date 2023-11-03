@@ -28,6 +28,9 @@ module tb ();
     wire bs_in = uio_in[2];
     wire config_en = uio_in[3];
 
+    wire [9:0]dendrite = {ui_in[7:0], uio_out[7:6]};
+    wire [9:0]out = {uo_out[7:0], uio_out[5:4]};
+
     wire [7:0] uo_out;
     wire [7:0] uio_out;
     wire [7:0] uio_oe;
