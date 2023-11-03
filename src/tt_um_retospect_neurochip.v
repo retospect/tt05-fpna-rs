@@ -134,7 +134,7 @@ module tt_um_retospect_neurochip #(
           // This is a bit more complicated because we need to handle the
           // case where we are at the bottom of the array
           if (LinIdx >= MaxLinIdx - Y_MAX) begin : gen_from_below_bottom
-            assign from_below[LinIdx] = axon[LinIdx-(MaxLinIdx-Y_MAX+1)];
+            assign from_below[LinIdx] = axon[LinIdx-(MaxLinIdx+Y_MAX)];
           end else begin : gen_from_below
             assign from_below[LinIdx] = axon[LinIdx+Y_MAX];
           end
