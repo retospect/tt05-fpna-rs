@@ -3,7 +3,8 @@
 module tt_um_retospect_neurochip #(
     parameter integer X_MAX = 5,
     parameter integer Y_MAX = 5,
-    parameter integer NUM_OUTPUTS = 10
+    parameter integer NUM_OUTPUTS = 10,
+    parameter integer NUM_INPUTS = 10
 ) (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
@@ -113,14 +114,6 @@ module tt_um_retospect_neurochip #(
           assign from_above[LinIdx] = axon[LinIdx-Y_MAX];
         end
 
-        // Wire up the from_below bits
-        // This is a bit more complicated because we need to handle the
-        // case where we are at the bottom of the array
-        if (LinIdx >= MaxLinIdx - Y_MAX) begin : gen_from_below_bottom
-          assign from_below[LinIdx] = axon[LinIdx-(MaxLinIdx-Y_MAX+1)];
-        end else begin : gen_from_below
-          assign from_below[LinIdx] = axon[LinIdx+Y_MAX];
-        end
 
         // Hook up the outputs
         // Calculate how far apart the outputs need to be to fit in the
@@ -134,7 +127,18 @@ module tt_um_retospect_neurochip #(
             assign outbus[LinIdx/SPACING] = axon[LinIdx];
           end
         end
-
+        if ((LinIdx == 1) & (LinIdx / SPACING < NUM_INPUTS)) begin : gen_connect_inputs
+          assign from_below[LinIdx] = inbus[LinIdx/SPACING];
+        end else begin : gen_connect_from_below_for_the_rest
+          // Wire up the from_below bits
+          // This is a bit more complicated because we need to handle the
+          // case where we are at the bottom of the array
+          if (LinIdx >= MaxLinIdx - Y_MAX) begin : gen_from_below_bottom
+            assign from_below[LinIdx] = axon[LinIdx-(MaxLinIdx-Y_MAX+1)];
+          end else begin : gen_from_below
+            assign from_below[LinIdx] = axon[LinIdx+Y_MAX];
+          end
+        end
       end
     end
   endgenerate
