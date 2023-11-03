@@ -282,10 +282,11 @@ module retospect_clockbox #(
 
   // clockbus 0 = 0 (never decay)
   // clockbus 1 = 1 (decay with each timestep)
-  // clockbus[2] to clockbus[7] are 1 if the corresponding clock_max and
-  // clock+count are equal
+  // clockbus[2] to clockbus[CLK_COUNT] are 1 if the corresponding clock_max and
+  // clock_count are equal
   assign clockbus[0] = 1'b0;
   assign clockbus[1] = 1'b1;
+
   generate
     genvar i;
     for (i = 0; i < CLK_COUNT; i = i + 1) begin : gen_clockbus_by_compare
