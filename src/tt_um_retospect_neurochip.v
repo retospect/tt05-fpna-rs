@@ -178,6 +178,19 @@ module retospect_cnb (
   wire my_decay;
   assign my_decay = clockbus[clockDecaySelect];
 
+  wire [3:0] d1_val;
+  wire [3:0] d2_val;
+  wire [3:0] d3_val;
+  wire [3:0] d4_val;
+
+  assign d1_val = dendrite1 ? w1 : 0;
+  assign d2_val = dendrite2 ? w2 : 0;
+  assign d3_val = dendrite3 ? w3 : 0;
+  assign d4_val = dendrite4 ? w4 : 0;
+
+  wire [3:0] total_current_weight;
+  assign total_current_weight = d1_val | d2_val | d3_val | d4_val;
+
   always @(posedge clk) begin
     if (reset) begin
       // Reset condition
@@ -203,43 +216,12 @@ module retospect_cnb (
       // Shift the bits in the register: bs_in is the new bit
       // and bs_out is the old bit
       // they pass thru w1, w2, w3, w4, uT, and clockDecaySelect in order
-      if (my_decay) begin  // if the decay clock comes around, divide by half.
-        // otherwise do nothing
-        uT <= {uT[3:1], 1'b0};
-      end
       if (uT[3]) begin  // clear the overflow bit if it is set
         uT[3] <= 1'b0;
-      end
-      if (my_decay) begin  // if the decay clock comes around, divide by half.
-        if (dendrite1) begin
-          uT <= (uT >> 1) + w1;
-        end
-        if (dendrite2) begin
-          uT <= (uT >> 1) + w2;
-        end
-        if (dendrite3) begin
-          uT <= (uT >> 1) + w3;
-        end
-        if (dendrite4) begin
-          uT <= (uT >> 1) + w4;
-        end
-        // if none of the dendrites are firing, then the neuron should decay
-        if ((dendrite1 == 0) && (dendrite3 == 0) && (dendrite4 == 0)) begin
-          uT <= uT >> 1;
-        end
+      end else if (my_decay) begin  // if the decay clock comes around, divide by half.
+        uT <= (uT >> 1) + total_current_weight;
       end else begin
-        if (dendrite1) begin
-          uT <= uT + w1;
-        end
-        if (dendrite2) begin
-          uT <= uT + w2;
-        end
-        if (dendrite3) begin
-          uT <= uT + w3;
-        end
-        if (dendrite4) begin
-          uT <= uT + w4;
-        end
+        uT <= uT + total_current_weight;
       end
     end
   end

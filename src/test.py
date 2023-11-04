@@ -374,13 +374,14 @@ async def test_cnb(dut):
     cnb.dendrite1.value = 1
     await ClockCycles(dut.clk, 1)
 
-    assert cnb.uT.value == 1 + 1 + 2 + 4 + 7
+    assert cnb.total_current_weight.value == 1
+    assert cnb.uT.value == 0
     cnb.dendrite1.value = 0
     await ClockCycles(dut.clk, 1)
-    assert cnb.uT.value == 0
+    assert cnb.uT.value == 1  # added 1 from dendrite 1
     assert cnb.axon.value == 0
 
-    # check firing with resduals
+    # check firing with residuals
     cnb.w1.value = cnb.w2.value = cnb.w3.value = cnb.w4.value = 0
     cnb.uT.value = 15
     await ClockCycles(dut.clk, 1)
