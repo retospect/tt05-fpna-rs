@@ -261,3 +261,29 @@ async def test_timing_block(dut):
     # #5
     await ClockCycles(dut.clk, 1)
     assert cb.clockbus.value == 0b00100110
+
+    # RESET!
+    await reset_nn(dut)
+    # all conters should be 0
+    for i in range(6):
+        assert cb.clock_count[i].value == 0
+    # and the bus should be 0, except for const
+    assert cb.clockbus.value == 0b00000010
+
+    # make an array with the expected binary pattern, in a nice format
+    expVal = []
+    expVal.append(0b00000010)
+    expVal.append(0b00000110)
+    expVal.append(0b00001010)
+    expVal.append(0b00010010)
+    expVal.append(0b00100110)
+    expVal.append(0b01000010)
+    expVal.append(0b10001010)
+    expVal.append(0b00000110)
+    # clock and check
+    for index, value in enumerate(expVal):
+        await ClockCycles(dut.clk, 1)
+        # print(index, bin(value), bin(cb.clockbus.value))
+        assert cb.clockbus.value == value
+
+
