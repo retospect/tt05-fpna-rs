@@ -9,7 +9,7 @@ bitstream_y = 5
 counter_cnt = 6
 
 # Run no tests:
-run_tests = True 
+run_tests = True
 
 
 def getBitstream():
@@ -223,7 +223,7 @@ async def test_basic_bs(dut):
 
 @cocotb.test()
 async def test_timing_block(dut):
-    """Basic test of timing block, does it update the timing bus and decay with each time step as desired?"""
+    """Basic test of timing block, does it update the timing bus"""
     if not run_tests:
         dut._log.info("Skipping")
         clk = Clock(dut.clk, 10, units="us")
@@ -345,10 +345,89 @@ async def test_cnb(dut):
         tl.clockbox.clock_max[i].value = i + 1
 
     assert cnb.clockDecaySelect.value == 0  # no decay
+    assert cnb.axon.value == 0
 
+    # scenario
     cnb.w1.value = 1
     cnb.w2.value = 2
     cnb.w3.value = 4
     cnb.w4.value = 7
-    await ClockCycles(dut.clk, 2)
-    assert cnb.uT.value == 1+1 
+    cnb.dendrite1.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 0
+    cnb.dendrite1.value = 0
+    cnb.dendrite2.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 0
+    assert cnb.uT.value == 1 + 1
+    cnb.dendrite2.value = 0
+    cnb.dendrite3.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 0
+    assert cnb.uT.value == 1 + 1 + 2
+    cnb.dendrite3.value = 0
+    cnb.dendrite4.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 1
+    assert cnb.uT.value == 1 + 1 + 2 + 4
+    cnb.dendrite4.value = 0
+    cnb.dendrite1.value = 1
+    await ClockCycles(dut.clk, 1)
+
+    assert cnb.uT.value == 1 + 1 + 2 + 4 + 7
+    cnb.dendrite1.value = 0
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 0
+    assert cnb.axon.value == 0
+
+    # check firing with resduals
+    cnb.w1.value = cnb.w2.value = cnb.w3.value = cnb.w4.value = 0
+    cnb.uT.value = 15
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 1
+    assert cnb.uT.value == 15
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 0
+    assert cnb.uT.value == 7  # residual charge after fully firing
+
+    cnb.w1.value = cnb.w2.value = cnb.w3.value = cnb.w4.value = 0
+    cnb.uT.value = 8
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 1
+    assert cnb.uT.value == 8
+    await ClockCycles(dut.clk, 1)
+    assert cnb.axon.value == 0
+    assert cnb.uT.value == 0  # uT - treshhold = 0 - no residual charge.
+
+
+@cocotb.test()
+async def test_decay(dut):
+    """Decay with each time step"""
+    if not run_tests:
+        dut._log.info("Skipping")
+        clk = Clock(dut.clk, 10, units="us")
+        cocotb.start_soon(clk.start())
+        await ClockCycles(dut.clk, 1)
+        print("Skipping")
+        return
+
+    # get the top level, to be terse later
+    tl = dut.tt_um_retospect_neurochip
+
+    # pick any neuron
+    cnb = tl.gen_x[2].gen_y[2].cnb
+
+    # initialize the lot
+    bs = getBitstream()
+
+    # Check reset
+    await reset(dut, bs)
+    assert cnb.uT.value == 0  # init from reset_nn
+    await reset_nn(dut)
+    # TODO: Init of uT
+    assert cnb.uT.value == 1  # init from reset_nn
+    assert cnb.clockDecaySelect.value == 0  # no decay
+
+    # set the timing bus config
+    for i in range(6):
+        tl.clockbox.clock_max[i].value = i + 1

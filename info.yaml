@@ -24,7 +24,7 @@ documentation:
   author:       "Reto Stamm"      # Your name
   title:        "Field Programmable Neural Array"      # Project title
   language:     "Verilog, Python, PyTorch and SNNTorch" # other examples include Verilog, Amaranth, VHDL, etc
-  description:  "A collection of 50 interconnected simulated leaky neurons that can be programmed to do computational tasks."      # Short description of what your project does
+  description:  "A collection of 50 interconnected simulated leaky neurons that can be programmed to do cognitive tasks."      # Short description of what your project does
 
 # Longer description of how the project works. You can use standard markdown format.
   how_it_works: |
