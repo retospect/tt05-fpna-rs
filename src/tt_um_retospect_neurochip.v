@@ -210,17 +210,36 @@ module retospect_cnb (
       if (uT[3]) begin  // clear the overflow bit if it is set
         uT[3] <= 1'b0;
       end
-      if (dendrite1) begin
-        uT <= uT + w1;
-      end
-      if (dendrite2) begin
-        uT <= uT + w2;
-      end
-      if (dendrite3) begin
-        uT <= uT + w3;
-      end
-      if (dendrite4) begin
-        uT <= uT + w4;
+      if (my_decay) begin  // if the decay clock comes around, divide by half.
+        if (dendrite1) begin
+          uT <= (uT >> 1) + w1;
+        end
+        if (dendrite2) begin
+          uT <= (uT >> 1) + w2;
+        end
+        if (dendrite3) begin
+          uT <= (uT >> 1) + w3;
+        end
+        if (dendrite4) begin
+          uT <= (uT >> 1) + w4;
+        end
+        // if none of the dendrites are firing, then the neuron should decay
+        if ((dendrite1 == 0) && (dendrite2 == 0) && (dendrite3 == 0) && (dendrite4 == 0)) begin
+          uT <= uT >> 1;
+        end
+      end else begin
+        if (dendrite1) begin
+          uT <= uT + w1;
+        end
+        if (dendrite2) begin
+          uT <= uT + w2;
+        end
+        if (dendrite3) begin
+          uT <= uT + w3;
+        end
+        if (dendrite4) begin
+          uT <= uT + w4;
+        end
       end
     end
   end

@@ -426,8 +426,6 @@ async def test_decay(dut):
     await reset_nn(dut)
 
     assert cnb.uT.value == 1  # init from reset_nn
-    assert cnb.clockDecaySelect.value == 0  # no decay
-
-    # set the timing bus config
-    for i in range(6):
-        tl.clockbox.clock_max[i].value = i + 1
+    cnb.clockDecaySelect.value == 0  # decay with every timestep
+    await ClockCycles(dut.clk, 2)
+    assert cnb.my_decay.value == 0
