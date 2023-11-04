@@ -278,7 +278,7 @@ module retospect_clockbox (
       // clock_count to 0
       // otherwise, increment the clock_count
       for (integer i = 0; i < CLK_COUNT; i = i + 1) begin
-        if (clock_count[i] > clock_max[i]) begin  // if it is higher than the max, reset
+        if (clock_count[i] >= clock_max[i]) begin  // if it is higher than the max, reset
           clock_count[i] <= 8'b00000000;
         end else begin
           clock_count[i] <= clock_count[i] + 1;  // otherwise increment

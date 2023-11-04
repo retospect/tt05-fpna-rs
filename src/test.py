@@ -232,7 +232,32 @@ async def test_timing_block(dut):
         cb.clock_max[i].value = i + 2
 
     # Check that the clock_counts are advancing
+    # #1
     await ClockCycles(dut.clk, 2)
     assert cb.clock_max[2].value == 4  # the configs are still there
     for i in range(6):
         assert cb.clock_count[i].value == 1  # clocks advanced
+    assert cb.clockbus.value == 0b00000010  # static 1 is 1, thats it
+
+    # #2
+    await ClockCycles(dut.clk, 1)
+    assert cb.clock_max[2].value == 4  # the configs are still there
+    for i in range(6):
+        assert cb.clock_count[i].value == 2  # clocks advanced
+    assert cb.clockbus.value == 0b00000110  # Now, 2 == 2!
+
+    assert cb.clock_count[0].value == 2
+    # #3
+    await ClockCycles(dut.clk, 1)
+    assert cb.clock_max[2].value == 4  # the configs are still there
+    assert cb.clock_count[0].value == 0  # Reset this one
+    assert cb.clockbus.value == 0b00001010  # Now, 2 == 2!
+    assert cb.clockbus.value == 0b00001010  # Now, 2 == 2!
+
+    # #4
+    await ClockCycles(dut.clk, 1)
+    assert cb.clockbus.value == 0b00010010
+
+    # #5
+    await ClockCycles(dut.clk, 1)
+    assert cb.clockbus.value == 0b00100110
