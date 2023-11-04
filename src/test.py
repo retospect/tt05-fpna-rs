@@ -36,8 +36,9 @@ async def loadBitstream(dut, bitstream):
     config_en.value = 1
 
     for bit in bitstream:
-        bs_in.value = bit
         await ClockCycles(dut.clk, 1)
+        bs_in.value = bit
+    await ClockCycles(dut.clk, 1)
     config_en.value = 0
     bs_in.value = 0
 
@@ -178,12 +179,17 @@ async def test_basic_bs(dut):
     bs.ones()
     await loadBitstream(dut, bs.getBS())
 
+    # todo: off by one bug with next line.
+    # should do nothing but inc the time
+    # await ClockCycles(dut.clk, 1)
     # check the ones() made it
     assert tl.gen_x[2].gen_y[2].cnb.uT.value == 15
     assert tl.gen_x[2].gen_y[2].cnb.w2.value == 7
     assert tl.gen_x[2].gen_y[3].cnb.w2.value == 7
     assert tl.clockbox.clock_max[3].value == 255
     await checkBitstream(dut, bs.getBS())
+
+    # await clock
 
     # and back to zeros
     bs.reset()
@@ -192,3 +198,41 @@ async def test_basic_bs(dut):
     assert tl.gen_x[2].gen_y[2].cnb.w2.value == 0
     assert tl.gen_x[2].gen_y[3].cnb.w2.value == 0
     assert tl.clockbox.clock_max[3].value == 0
+
+    # check that the bits are not moving around when not configuring
+    tl.gen_x[2].gen_y[2].cnb.w2.value = 3
+    tl.gen_x[3].gen_y[2].cnb.uT.value = 7
+    tl.clockbox.clock_max[3].value = 9
+    # confuzius's clock clocked 10 times
+    await ClockCycles(dut.clk, 10)
+    assert tl.gen_x[2].gen_y[2].cnb.w2.value == 3
+    assert tl.gen_x[3].gen_y[2].cnb.uT.value == 7
+    assert tl.clockbox.clock_max[3].value == 9
+
+
+@cocotb.test()
+async def test_timing_block(dut):
+    """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+
+    # get the top level, to be terse later
+    tl = dut.tt_um_retospect_neurochip
+
+    # initialize the lot
+    bs = getBitstream()
+    await reset(dut, bs)
+
+    # simplify:
+    cb = tl.clockbox
+
+    # Check the timing block:
+    for i in range(6):
+        assert cb.clock_max[i].value == 0
+        assert cb.clock_count[i].value == 0
+    for i in range(6):
+        cb.clock_max[i].value = i + 1
+
+    # Check that the clock_counts are all 0 at init time
+    await ClockCycles(dut.clk, 2)
+    assert cb.clock_max[2].value == 3  # the configs are still there
+    for i in range(6):
+        assert cb.clock_count[i].value == 1  # clocks advanced
