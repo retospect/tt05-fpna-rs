@@ -9,7 +9,7 @@ bitstream_y = 5
 counter_cnt = 6
 
 # Run no tests:
-run_tests = False
+run_tests = True 
 
 
 def getBitstream():
@@ -313,8 +313,8 @@ async def test_timing_block(dut):
 
 
 @cocotb.test()
-async def test_decay_with_each_timestep(dut):
-    """Basic test of shift register bitstream - is it the right length, do 1's and 0's make it. BS!"""
+async def test_cnb(dut):
+    """Basic test of cnb"""
     if not run_tests:
         dut._log.info("Skipping")
         clk = Clock(dut.clk, 10, units="us")
@@ -350,4 +350,5 @@ async def test_decay_with_each_timestep(dut):
     cnb.w2.value = 2
     cnb.w3.value = 4
     cnb.w4.value = 7
-    cnb.dendrite1.value = 1
+    await ClockCycles(dut.clk, 2)
+    assert cnb.uT.value == 1+1 
