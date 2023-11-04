@@ -94,7 +94,7 @@ async def reset(dut, bitstream):
     config_en.value = 0
 
 
-def listEntries(item):
+async def listEntries(item):
     """Shows all the objects in an item"""
     # get the type of item
     # if item is iterable, print its type and recurse into it
@@ -115,7 +115,7 @@ def listEntries(item):
         else:
             # print("DOWN: %s: %s" % (fullpath, t))
             for i in item:
-                listEntries(i)
+                await listEntries(i)
 
     # if it is a modifiable object, print its full _path and value
     if "ModifiableObject" in str(t):
@@ -126,7 +126,7 @@ def listEntries(item):
 
     # if it is a constant object, print its full _path and value
     elif "ConstantObject" in str(t):
-        print("C: %s: %s (C)" % (fullpath, item.value))
+        print("C: %s: %s (Const)" % (fullpath, item.value))
 
     elif "HierarchyObject" in str(t) or "HierarchyArrayObject" in str(t):
         # print("%s" % (fullpath))
@@ -147,64 +147,48 @@ def b2i(x):
     """Converts a cocotb binary value to an integer"""
     return int(str(x), 2)
 
+async def reset_nn(dut):
+    """Reset the neuron"""
+    dut.uio_in[0].value = 1
+    await ClockCycles(dut.clk, 1)
+    dut.uio_in[0].value = 0
+    await ClockCycles(dut.clk, 1)
 
 @cocotb.test()
-async def test_shiftreg(dut):
+async def test_basic_bs(dut):
+    """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+    
+    # get the top level, to be terse later
+    tl = dut.tt_um_retospect_neurochip
+
+    # initialize the lot
     bitstream = getBitstream()
     await reset(dut, bitstream)
-    print("After reset")
+
+    # Check some things in the model; 
+    assert tl.gen_x[2].gen_y[2].cnb.uT.value == 0
+    assert tl.gen_x[2].gen_y[2].cnb.w2.value == 0
+    assert tl.clockbox.clock_max[0].value == 0
+
+    # Check Bitstream: It should be unchanged
     await checkBitstream(dut, bitstream.getBS())
-
-    # Reset_nn is high for a cycle, so all the uT values should be
-    # set to 1
-    for cell in bitstream.getAllCells():
-        cell.uT.set(1)
-    reset_nn = dut.uio_in[0]
-    reset_nn.value = 1
-    await ClockCycles(dut.clk, 1)
-    reset_nn.value = 0
-
-    print("After reset_nn")
-    await loadBitstream(dut, bitstream.getBS())
 
     bitstream.ones()
-    bitstream.cells[0][0].uT.set(5)
-    bitstream.cells[bitstream_x - 1][bitstream_y - 1].uT.set(3)
-    print("After ones")
+    await loadBitstream(dut, bitstream.getBS())
 
-    listEntries(tl.gen_x[2].gen_y[2])
-    await loadBitstream(dut, bitstream.getBS())
-    listEntries(tl.gen_x[2].gen_y[2])
-    await checkBitstream(dut, bitstream.getBS())
-    listEntries(tl.gen_x[2].gen_y[2])
-    exit(0)
-    bitstream.clockbox.delay[3].set(5)
-    bitstream.cells[2][2].w1.set(4)
-    bitstream.cells[2][3].w2.set(6)
-    bitstream.cells[1][4].clockDecay.set(3)
-    await loadBitstream(dut, bitstream.getBS())
+    # check the ones() made it 
+    assert tl.gen_x[2].gen_y[2].cnb.uT.value == 15
+    assert tl.gen_x[2].gen_y[2].cnb.w2.value == 7
+    assert tl.gen_x[2].gen_y[3].cnb.w2.value == 7
+    assert tl.clockbox.clock_max[3].value == 255
     await checkBitstream(dut, bitstream.getBS())
 
-
-@cocotb.test()
-async def test_register_mapping(dut):
-    bitstream = getBitstream()
-    bitstream.clockbox.delay[3].set(5)
-    assert int(bitstream.clockbox.delay[3].value) == 5
-    
-    bitstream.cells[2][2].w1.set(4)
-    await reset(dut, bitstream)
-    loadBitstream(dut, bitstream.getBS())
-    tl = dut.tt_um_retospect_neurochip
-    assert tl.uio_out[0].value == 0
-    listEntries(tl.gen_x[2].gen_y[2])
-    assert tl.gen_x[2].gen_y[2].w1.value == 4
-    print("X"*10, tl.clockbox.clock_max[3].value)
-    assert int(tl.clockbox.clock_max[3].value) == 5
+    # check the zeros() made it
+    bitstream.reset()
+    await loadBitstream(dut, bitstream.getBS())
+    assert tl.gen_x[2].gen_y[2].cnb.uT.value == 0 
+    assert tl.gen_x[2].gen_y[2].cnb.w2.value == 0
+    assert tl.gen_x[2].gen_y[3].cnb.w2.value == 0
+    assert tl.clockbox.clock_max[3].value == 0 
 
 
-@cocotb.test()
-async def test_clockgen(dut):
-    bitstream = getBitstream()
-    bitstream.clockbox.delay[3].set(5)
-    await reset(dut, bitstream)
