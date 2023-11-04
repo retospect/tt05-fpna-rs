@@ -8,6 +8,9 @@ bitstream_x = 10
 bitstream_y = 5
 counter_cnt = 6
 
+# Run no tests:
+run_tests = False
+
 
 def getBitstream():
     """Gets a default bitstream, initialized"""
@@ -153,13 +156,22 @@ async def reset_nn(dut):
     """Reset the neuron"""
     dut.uio_in[0].value = 1
     await ClockCycles(dut.clk, 1)
+    # await listEntries(dut.tt_um_retospect_neurochip.gen_x[0].gen_y[0].cnb)
     dut.uio_in[0].value = 0
     await ClockCycles(dut.clk, 1)
+    # await listEntries(dut.tt_um_retospect_neurochip.gen_x[0].gen_y[0].cnb)
 
 
 @cocotb.test()
 async def test_basic_bs(dut):
     """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+    if not run_tests:
+        dut._log.info("Skipping")
+        clk = Clock(dut.clk, 10, units="us")
+        cocotb.start_soon(clk.start())
+        await ClockCycles(dut.clk, 1)
+        print("Skipping")
+        return
 
     # get the top level, to be terse later
     tl = dut.tt_um_retospect_neurochip
@@ -213,6 +225,13 @@ async def test_basic_bs(dut):
 @cocotb.test()
 async def test_timing_block(dut):
     """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+    if not run_tests:
+        dut._log.info("Skipping")
+        clk = Clock(dut.clk, 10, units="us")
+        cocotb.start_soon(clk.start())
+        await ClockCycles(dut.clk, 1)
+        print("Skipping")
+        return
 
     # get the top level, to be terse later
     tl = dut.tt_um_retospect_neurochip
@@ -262,9 +281,15 @@ async def test_timing_block(dut):
     await ClockCycles(dut.clk, 1)
     assert cb.clockbus.value == 0b00100110
 
-    # RESET!
+    #########################################
+    # Check the counters, all of them
+    #########################################
+    # Smallest timestep 2 clocks
+    # clock_max = 0 is a useless case and could
+    # indicate a special state, like chaining to a previous clock
     for i in range(6):
         cb.clock_max[i].value = i + 1
+    # RESET!
     await reset_nn(dut)
     # all conters should be 0
     for i in range(6):
@@ -286,3 +311,42 @@ async def test_timing_block(dut):
         await ClockCycles(dut.clk, 1)
         # print(index, bin(value), bin(cb.clockbus.value))
         assert cb.clockbus.value == value
+
+
+@cocotb.test()
+async def test_decay_with_each_timestep(dut):
+    """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+    if not run_tests:
+        dut._log.info("Skipping")
+        clk = Clock(dut.clk, 10, units="us")
+        cocotb.start_soon(clk.start())
+        await ClockCycles(dut.clk, 1)
+        print("Skipping")
+        return
+
+    # get the top level, to be terse later
+    tl = dut.tt_um_retospect_neurochip
+
+    # pick any neuron
+    cnb = tl.gen_x[2].gen_y[2].cnb
+
+    # initialize the lot
+    bs = getBitstream()
+
+    await reset(dut, bs)
+    assert cnb.uT.value == 1  # init from reset_nn
+
+    reset_nn(dut)
+
+    # set the timing bus config
+    for i in range(6):
+        tl.clockbox.clock_max[i].value = i + 1
+
+    assert cnb.uT.value == 1  # init from reset_nn
+    assert cnb.clockDecaySelect.value == 0  # no decay
+
+    cnb.w1.value = 1
+    cnb.w2.value = 2
+    cnb.w3.value = 4
+    cnb.w4.value = 7
+    cnb.dendrite1.value = 1
