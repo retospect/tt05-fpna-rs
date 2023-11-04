@@ -72,6 +72,7 @@ async def reset(dut, bitstream):
         dut.uio_in[i].value = 0
         dut.ui_in[i].value = 0
     config_en = dut.uio_in[3]
+    dut.tt_um_retospect_neurochip.ena.value = 1
 
     dut._log.info("start")
     clock = Clock(dut.clk, 10, units="us")
@@ -91,6 +92,60 @@ async def reset(dut, bitstream):
     dut._log.info("bitstream length: %d" % len(bitarray))
     await loadBitstream(dut, bitarray)
     config_en.value = 0
+
+
+def listEntries(item):
+    """Shows all the objects in an item"""
+    # get the type of item
+    # if item is iterable, print its type and recurse into it
+
+    t = type(item)
+    # if it is not a cocotb object, print its type and return
+    if not "cocotb" in str(t):
+        print("not cocotb object: %s: %s" % (item, t))
+        return
+
+    # if it is a cocotb object, print its type
+    fullpath = item._path
+    if hasattr(item, "__iter__"):
+        # if this object has a value, do not recurse into it
+        if hasattr(item, "value"):
+            pass
+
+        else:
+            # print("DOWN: %s: %s" % (fullpath, t))
+            for i in item:
+                listEntries(i)
+
+    # if it is a modifiable object, print its full _path and value
+    if "ModifiableObject" in str(t):
+        print("V: %s: %s" % (fullpath, item.value))
+
+    elif "NonHierarchyIndexableObject" in str(t):
+        print("NHI: %s: %s" % (fullpath, item.value))
+
+    # if it is a constant object, print its full _path and value
+    elif "ConstantObject" in str(t):
+        print("C: %s: %s (C)" % (fullpath, item.value))
+
+    elif "HierarchyObject" in str(t) or "HierarchyArrayObject" in str(t):
+        # print("%s" % (fullpath))
+        # if it is a hierarchy object, recurse into it
+        # for name, handle in item._sub_handles.items():
+        #    # catch any exceptions and print them while iterating
+        #    try:
+        #        listEntries(handle)
+        #    except Exception as e:
+        #        print("Exception while processing child of %s: %s" % (fullpath, e))
+        pass
+    else:
+        print("unknown type: %s: %s" % (t, item))
+    return
+
+
+def b2i(x):
+    """Converts a cocotb binary value to an integer"""
+    return int(str(x), 2)
 
 
 @cocotb.test()
@@ -121,5 +176,19 @@ async def test_shiftreg(dut):
 
 
 @cocotb.test()
-async def test_other(dut):
+async def test_register_mapping(dut):
     bitstream = getBitstream()
+    bitstream.clockbox.delay[3].set(5)
+    bitstream.reset()
+    await reset(dut, bitstream)
+    tl = dut.tt_um_retospect_neurochip
+    assert tl.uio_out[0].value == 0
+    listEntries(tl.clockbox)
+    assert inti(tl.clockbox.clock_max[3].value) == 5
+
+
+@cocotb.test()
+async def test_clockgen(dut):
+    bitstream = getBitstream()
+    bitstream.clockbox.delay[3].set(5)
+    await reset(dut, bitstream)

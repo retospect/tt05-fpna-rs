@@ -1,11 +1,13 @@
 `default_nettype none
 
-module tt_um_retospect_neurochip #(
-    parameter integer X_MAX = 10,
-    parameter integer Y_MAX = 5,
-    parameter integer NUM_OUTPUTS = 10,
-    parameter integer NUM_INPUTS = 10
-) (
+
+parameter integer CLK_COUNT = 6; // and 0, 1 are on the first two lines, then we have CLK_COUNT more with actual counters
+parameter integer X_MAX = 10;
+parameter integer Y_MAX = 5;
+parameter integer NUM_OUTPUTS = 10;
+parameter integer NUM_INPUTS = 10;
+
+module tt_um_retospect_neurochip (
     input  wire [7:0] ui_in,    // Dedicated inputs - connected to the input switches
     output wire [7:0] uo_out,   // Dedicated outputs - connected to the 7 segment display
     /* verilator lint_off UNUSEDSIGNAL */
@@ -224,10 +226,7 @@ module retospect_cnb (
 
 endmodule
 
-module retospect_clockbox #(
-    parameter integer CLK_COUNT = 6
-)  // and 0, 1 are on the first two lines, then we have CLK_COUNT more with actual counters
-(
+module retospect_clockbox (
     input wire config_en,
     input wire bs_in,
     output wire bs_out,
