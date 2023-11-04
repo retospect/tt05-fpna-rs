@@ -147,6 +147,7 @@ def b2i(x):
     """Converts a cocotb binary value to an integer"""
     return int(str(x), 2)
 
+
 async def reset_nn(dut):
     """Reset the neuron"""
     dut.uio_in[0].value = 1
@@ -154,41 +155,40 @@ async def reset_nn(dut):
     dut.uio_in[0].value = 0
     await ClockCycles(dut.clk, 1)
 
+
 @cocotb.test()
 async def test_basic_bs(dut):
     """Basic test of shift register - is it the right length, do 1's and 0's make it"""
-    
+
     # get the top level, to be terse later
     tl = dut.tt_um_retospect_neurochip
 
     # initialize the lot
-    bitstream = getBitstream()
-    await reset(dut, bitstream)
+    bs = getBitstream()
+    await reset(dut, bs)
 
-    # Check some things in the model; 
+    # Check some things in the model;
     assert tl.gen_x[2].gen_y[2].cnb.uT.value == 0
     assert tl.gen_x[2].gen_y[2].cnb.w2.value == 0
     assert tl.clockbox.clock_max[0].value == 0
 
     # Check Bitstream: It should be unchanged
-    await checkBitstream(dut, bitstream.getBS())
+    await checkBitstream(dut, bs.getBS())
 
-    bitstream.ones()
-    await loadBitstream(dut, bitstream.getBS())
+    bs.ones()
+    await loadBitstream(dut, bs.getBS())
 
-    # check the ones() made it 
+    # check the ones() made it
     assert tl.gen_x[2].gen_y[2].cnb.uT.value == 15
     assert tl.gen_x[2].gen_y[2].cnb.w2.value == 7
     assert tl.gen_x[2].gen_y[3].cnb.w2.value == 7
     assert tl.clockbox.clock_max[3].value == 255
-    await checkBitstream(dut, bitstream.getBS())
+    await checkBitstream(dut, bs.getBS())
 
-    # check the zeros() made it
-    bitstream.reset()
-    await loadBitstream(dut, bitstream.getBS())
-    assert tl.gen_x[2].gen_y[2].cnb.uT.value == 0 
+    # and back to zeros
+    bs.reset()
+    await loadBitstream(dut, bs.getBS())
+    assert tl.gen_x[2].gen_y[2].cnb.uT.value == 0
     assert tl.gen_x[2].gen_y[2].cnb.w2.value == 0
     assert tl.gen_x[2].gen_y[3].cnb.w2.value == 0
-    assert tl.clockbox.clock_max[3].value == 0 
-
-
+    assert tl.clockbox.clock_max[3].value == 0
