@@ -336,7 +336,7 @@ async def test_cnb(dut):
     await reset(dut, bs)
     assert cnb.uT.value == 0  # init from reset_nn
     await reset_nn(dut)
-    # TODO: Init of uT
+
     assert cnb.uT.value == 1  # init from reset_nn
     assert cnb.clockDecaySelect.value == 0  # no decay
 
@@ -424,7 +424,7 @@ async def test_decay(dut):
     await reset(dut, bs)
     assert cnb.uT.value == 0  # init from reset_nn
     await reset_nn(dut)
-    # TODO: Init of uT
+
     assert cnb.uT.value == 1  # init from reset_nn
     assert cnb.clockDecaySelect.value == 0  # no decay
 
