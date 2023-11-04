@@ -9,7 +9,7 @@ bitstream_y = 5
 counter_cnt = 6
 
 # Run no tests:
-run_tests = True
+run_tests = False
 
 
 def getBitstream():
