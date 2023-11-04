@@ -179,7 +179,7 @@ async def test_basic_bs(dut):
     bs.ones()
     await loadBitstream(dut, bs.getBS())
 
-    # todo: off by one bug with next line. 
+    # todo: off by one bug with next line.
     # should do nothing but inc the time
     # await ClockCycles(dut.clk, 1)
     # check the ones() made it
@@ -209,6 +209,7 @@ async def test_basic_bs(dut):
     assert tl.gen_x[3].gen_y[2].cnb.uT.value == 7
     assert tl.clockbox.clock_max[3].value == 9
 
+
 @cocotb.test()
 async def test_timing_block(dut):
     """Basic test of shift register - is it the right length, do 1's and 0's make it"""
@@ -228,12 +229,10 @@ async def test_timing_block(dut):
         assert cb.clock_max[i].value == 0
         assert cb.clock_count[i].value == 0
     for i in range(6):
-        cb.clock_max[i].value = i+2
+        cb.clock_max[i].value = i + 2
 
     # Check that the clock_counts are advancing
-    await ClockCycles(dut.clk, 2) 
-    assert cb.clock_max[2].value == 3 # the configs are still there
+    await ClockCycles(dut.clk, 2)
+    assert cb.clock_max[2].value == 4  # the configs are still there
     for i in range(6):
-        assert cb.clock_count[i].value == 1 # clocks advanced
-
-    
+        assert cb.clock_count[i].value == 1  # clocks advanced
