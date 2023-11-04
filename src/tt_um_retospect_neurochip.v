@@ -81,8 +81,8 @@ module tt_um_retospect_neurochip (
 
   generate
     genvar x, y;
-    for (x = 0; x < X_MAX; x = x + 1) begin : gen_x_loop
-      for (y = 0; y < Y_MAX; y = y + 1) begin : gen_y_loop
+    for (x = 0; x < X_MAX; x = x + 1) begin : gen_x
+      for (y = 0; y < Y_MAX; y = y + 1) begin : gen_y
         localparam int LinIdx = x * Y_MAX + y;
         localparam int MaxLinIdx = X_MAX * Y_MAX - 1;
         // instantiate the cnb
@@ -268,9 +268,11 @@ module retospect_clockbox (
       // and bs_out is the old bit
       // they pass thru w1, w2, w3, w4, uT, and clockDecaySelect in order
       clock_max[0] <= {bs_in, clock_max[0][7:1]};
-      for (integer i = 1; i < CLK_COUNT; i = i + 1) begin
-        clock_max[i] <= {clock_max[i-1][0], clock_max[i][7:1]};
-      end
+      clock_max[1] <= {clock_max[0][0], clock_max[1][7:1]};
+      clock_max[2] <= {clock_max[1][0], clock_max[2][7:1]};
+      clock_max[3] <= {clock_max[2][0], clock_max[3][7:1]};
+      clock_max[4] <= {clock_max[3][0], clock_max[4][7:1]};
+      clock_max[5] <= {clock_max[4][0], clock_max[5][7:1]};
     end else begin
       // if the clock_count is higher than the clock_max, reset the
       // clock_count to 0

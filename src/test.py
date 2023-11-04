@@ -171,6 +171,17 @@ async def test_shiftreg(dut):
     bitstream.cells[0][0].uT.set(5)
     bitstream.cells[bitstream_x - 1][bitstream_y - 1].uT.set(3)
     print("After ones")
+
+    listEntries(tl.gen_x[2].gen_y[2])
+    await loadBitstream(dut, bitstream.getBS())
+    listEntries(tl.gen_x[2].gen_y[2])
+    await checkBitstream(dut, bitstream.getBS())
+    listEntries(tl.gen_x[2].gen_y[2])
+    exit(0)
+    bitstream.clockbox.delay[3].set(5)
+    bitstream.cells[2][2].w1.set(4)
+    bitstream.cells[2][3].w2.set(6)
+    bitstream.cells[1][4].clockDecay.set(3)
     await loadBitstream(dut, bitstream.getBS())
     await checkBitstream(dut, bitstream.getBS())
 
@@ -179,12 +190,17 @@ async def test_shiftreg(dut):
 async def test_register_mapping(dut):
     bitstream = getBitstream()
     bitstream.clockbox.delay[3].set(5)
-    bitstream.reset()
+    assert int(bitstream.clockbox.delay[3].value) == 5
+    
+    bitstream.cells[2][2].w1.set(4)
     await reset(dut, bitstream)
+    loadBitstream(dut, bitstream.getBS())
     tl = dut.tt_um_retospect_neurochip
     assert tl.uio_out[0].value == 0
-    listEntries(tl.clockbox)
-    assert inti(tl.clockbox.clock_max[3].value) == 5
+    listEntries(tl.gen_x[2].gen_y[2])
+    assert tl.gen_x[2].gen_y[2].w1.value == 4
+    print("X"*10, tl.clockbox.clock_max[3].value)
+    assert int(tl.clockbox.clock_max[3].value) == 5
 
 
 @cocotb.test()
