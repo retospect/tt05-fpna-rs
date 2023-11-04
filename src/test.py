@@ -430,7 +430,55 @@ async def test_decay(dut):
     await ClockCycles(dut.clk, 2)
     assert cnb.my_decay.value == 0
 
-    assert cnb.uT.value == 1  # init from reset_nn
-    cnb.clockDecaySelect.value == 1  # decay with every timestep
+    cnb.clockDecaySelect.value = 1  # decay with every timestep
     await ClockCycles(dut.clk, 2)
-    assert cnb.my_decay.value == 0
+    assert cnb.clockDecaySelect.value == 1
+    assert cnb.my_decay.value == 1
+    assert cnb.uT.value == 0  # decay!
+
+    # Simple decay
+    cnb.uT.value = 7
+    cnb.clockDecaySelect.value = 1  # decay with every timestep
+    await ClockCycles(dut.clk, 2)
+    assert cnb.clockDecaySelect.value == 1
+    assert cnb.my_decay.value == 1
+    assert cnb.uT.value == 3
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 0
+
+    # Decay while adding a single one!
+    cnb.uT.value = 7
+    cnb.w1.value = cnb.w2.value = cnb.w3.value = cnb.w4.value = 1
+    cnb.dendrite1.value = 1
+    cnb.clockDecaySelect.value = 1  # decay with every timestep
+    await ClockCycles(dut.clk, 2)
+    assert cnb.clockDecaySelect.value == 1
+    assert cnb.my_decay.value == 1
+    assert cnb.uT.value == 4
+    cnb.dendrite1.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 3
+    cnb.dendrite1.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 2
+
+    # Decay while adding two!
+    cnb.uT.value = 7
+    cnb.w1.value = cnb.w2.value = cnb.w3.value = cnb.w4.value = 1
+    cnb.dendrite1.value = 1
+    cnb.dendrite2.value = 1
+    cnb.clockDecaySelect.value = 1  # decay with every timestep
+    await ClockCycles(dut.clk, 2)
+    assert cnb.clockDecaySelect.value == 1
+    assert cnb.my_decay.value == 1
+    assert cnb.uT.value == 4
+    cnb.dendrite1.value = 1
+    cnb.dendrite2.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 3
+    cnb.dendrite1.value = 1
+    cnb.dendrite2.value = 1
+    await ClockCycles(dut.clk, 1)
+    assert cnb.uT.value == 2

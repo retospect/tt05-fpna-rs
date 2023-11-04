@@ -224,7 +224,7 @@ module retospect_cnb (
           uT <= (uT >> 1) + w4;
         end
         // if none of the dendrites are firing, then the neuron should decay
-        if ((dendrite1 == 0) && (dendrite2 == 0) && (dendrite3 == 0) && (dendrite4 == 0)) begin
+        if ((dendrite1 == 0) && (dendrite3 == 0) && (dendrite4 == 0)) begin
           uT <= uT >> 1;
         end
       end else begin
