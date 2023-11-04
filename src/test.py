@@ -9,7 +9,7 @@ bitstream_y = 5
 counter_cnt = 6
 
 # Run no tests:
-run_tests = False
+run_tests = True
 
 
 def getBitstream():
@@ -92,7 +92,6 @@ async def reset(dut, bitstream):
     bitstream = getBitstream()
     bitarray = bitstream.getBS()
 
-    print("bitstream length: %d" % len(bitarray))
     dut._log.info("bitstream length: %d" % len(bitarray))
     await loadBitstream(dut, bitarray)
     config_en.value = 0
@@ -224,7 +223,7 @@ async def test_basic_bs(dut):
 
 @cocotb.test()
 async def test_timing_block(dut):
-    """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+    """Basic test of timing block, does it update the timing bus and decay with each time step as desired?"""
     if not run_tests:
         dut._log.info("Skipping")
         clk = Clock(dut.clk, 10, units="us")
@@ -315,7 +314,7 @@ async def test_timing_block(dut):
 
 @cocotb.test()
 async def test_decay_with_each_timestep(dut):
-    """Basic test of shift register - is it the right length, do 1's and 0's make it"""
+    """Basic test of shift register bitstream - is it the right length, do 1's and 0's make it. BS!"""
     if not run_tests:
         dut._log.info("Skipping")
         clk = Clock(dut.clk, 10, units="us")
@@ -333,16 +332,18 @@ async def test_decay_with_each_timestep(dut):
     # initialize the lot
     bs = getBitstream()
 
+    # Check reset
     await reset(dut, bs)
+    assert cnb.uT.value == 0  # init from reset_nn
+    await reset_nn(dut)
+    # TODO: Init of uT
     assert cnb.uT.value == 1  # init from reset_nn
-
-    reset_nn(dut)
+    assert cnb.clockDecaySelect.value == 0  # no decay
 
     # set the timing bus config
     for i in range(6):
         tl.clockbox.clock_max[i].value = i + 1
 
-    assert cnb.uT.value == 1  # init from reset_nn
     assert cnb.clockDecaySelect.value == 0  # no decay
 
     cnb.w1.value = 1
