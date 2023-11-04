@@ -429,3 +429,8 @@ async def test_decay(dut):
     cnb.clockDecaySelect.value == 0  # decay with every timestep
     await ClockCycles(dut.clk, 2)
     assert cnb.my_decay.value == 0
+
+    assert cnb.uT.value == 1  # init from reset_nn
+    cnb.clockDecaySelect.value == 1  # decay with every timestep
+    await ClockCycles(dut.clk, 2)
+    assert cnb.my_decay.value == 0
