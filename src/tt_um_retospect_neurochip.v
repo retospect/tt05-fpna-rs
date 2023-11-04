@@ -1,9 +1,15 @@
 `default_nettype none
 
+// Decay Clock Definition:
+// and 0, 1 are on the first two lines,
+//then we have CLK_COUNT more with actual counters
+parameter integer CLK_COUNT = 6;
 
-parameter integer CLK_COUNT = 6; // and 0, 1 are on the first two lines, then we have CLK_COUNT more with actual counters
+// Array definition: THis is the size of the array
 parameter integer X_MAX = 10;
 parameter integer Y_MAX = 5;
+
+// nuber of inputs and outputs
 parameter integer NUM_OUTPUTS = 10;
 parameter integer NUM_INPUTS = 10;
 
